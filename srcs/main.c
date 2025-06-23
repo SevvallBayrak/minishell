@@ -14,12 +14,12 @@ int	main(void)
 			break;
 		if (*input)
 			add_history(input);
-		if (check_unclosed_quotes(input))
-		{
-			printf("Syntax error: unclosed quote detected.\n");
-			free(input);
-			continue;
-		}
+		// if (check_unclosed_quotes(input))
+		// {
+		// 	printf("Syntax error: unclosed quote detected.\n");
+		// 	free(input);
+		// 	continue;
+		// }
 
 		tokens = tokenize_input(input);
 		for (i = 0; tokens[i]; i++)
