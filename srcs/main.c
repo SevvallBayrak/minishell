@@ -1,9 +1,10 @@
+
 #include "minishell.h"
 
 int	main(void)
 {
 	char	*input;
-
+	printf("helloo");
 	while (1)
 	{
 		input = readline("minishell> ");
@@ -14,5 +15,5 @@ int	main(void)
 		free(input);
 	}
 	printf("exit\n");
-	return (0);
+	return(0);
 }
