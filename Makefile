@@ -1,6 +1,7 @@
 NAME = minishell
 
-SRCS = srcs/main.c srcs/prompt.c
+SRCS = srcs/main.c srcs/prompt.c srcs/parser.c
+
 OBJS = $(SRCS:.c=.o)
 
 LIBFT_DIR = libft
