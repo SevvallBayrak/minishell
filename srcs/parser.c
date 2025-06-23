@@ -2,6 +2,22 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdbool.h>
+
+bool	check_unclosed_quotes(const char *str)
+{
+	char	quote = 0;
+
+	while (*str)
+	{
+		if ((*str == '\'' || *str == '"') && quote == 0)
+			quote = *str;
+		else if (*str == quote)
+			quote = 0;
+		str++;
+	}
+	return (quote != 0);
+}
 
 // Özel karakter kontrolü
 int is_special(char c) {
