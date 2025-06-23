@@ -1,34 +1,58 @@
 NAME = minishell
 
-SRCS = srcs/main.c srcs/prompt.c srcs/parser.c
+# Source files
+SRCS = srcs/main.c srcs/expand.c srcs/parser.c srcs/prompt.c
 
+# Object files
 OBJS = $(SRCS:.c=.o)
 
-LIBFT_DIR = libft
-LIBFT_LIB = $(LIBFT_DIR)/libft.a
-
-
-READLINE_DIR = /opt/homebrew/opt/readline
-INCLUDES = -Iincludes -I$(LIBFT_DIR) -I$(READLINE_DIR)/include
-READLINE = -L$(READLINE_DIR)/lib -lreadline
-
+# Compiler and flags
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -g $(INCLUDES)
+CFLAGS = -Wall -Wextra -Werror -g -Iincludes
+LDFLAGS = -lreadline
+
+# Colors
+GREEN = \033[0;32m
+YELLOW = \033[0;33m
+RED = \033[0;31m
+RESET = \033[0m
 
 all: $(NAME)
 
-$(NAME): $(LIBFT_LIB) $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) $(LIBFT_LIB) $(READLINE) -o $(NAME)
+$(NAME): $(OBJS)
+	@echo "$(YELLOW)Linking $(NAME)...$(RESET)"
+	@$(CC) $(OBJS) $(LDFLAGS) -o $(NAME)
+	@echo "$(GREEN)$(NAME) created successfully!$(RESET)"
 
-$(LIBFT_LIB):
-	make -C $(LIBFT_DIR)
+%.o: %.c includes/minishell.h
+	@echo "$(YELLOW)Compiling $<...$(RESET)"
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJS)
-	make clean -C $(LIBFT_DIR)
+	@echo "$(RED)Removing object files...$(RESET)"
+	@rm -f $(OBJS)
 
 fclean: clean
-	rm -f $(NAME)
-	make fclean -C $(LIBFT_DIR)
+	@echo "$(RED)Removing $(NAME)...$(RESET)"
+	@rm -f $(NAME)
 
 re: fclean all
+
+# Test with variable expansion
+test: $(NAME)
+	@echo "$(GREEN)Testing variable expansion...$(RESET)"
+	@echo "Starting minishell test..."
+	@echo 'echo "$$USER"' | ./$(NAME)
+	@echo 'echo '\''$$USER'\''' | ./$(NAME)
+
+# Debug with valgrind
+debug: $(NAME)
+	@echo "$(YELLOW)Running with valgrind...$(RESET)"
+	valgrind --leak-check=full --track-origins=yes ./$(NAME)
+
+# Memory test
+memtest: $(NAME)
+	@echo "$(YELLOW)Memory leak test...$(RESET)"
+	@valgrind --leak-check=full --show-leak-kinds=all ./$(NAME) < /dev/null
+
+.PHONY: all clean fclean re test debug memtest
