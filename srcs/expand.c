@@ -1,12 +1,11 @@
 #include "minishell.h"
-#include "parser.h"
 
 char *expand_variable(const char *token, t_shell_state *shell)
 {
-    if (!token || !strchr(token, '$'))
-        return strdup(token);
+    if (!token || !ft_strchr(token, '$'))
+        return ft_strdup(token);
     
-    char *result = calloc(1, 1);
+    char *result = ft_calloc(1, 1);
     const char *p = token;
     
     while (*p)
@@ -17,10 +16,11 @@ char *expand_variable(const char *token, t_shell_state *shell)
             {
                 // $? - exit status expansion
                 char buffer[12];
-                sprintf(buffer, "%d", shell->last_exit_status);
-                size_t old_len = strlen(result);
-                size_t new_len = old_len + strlen(buffer);
-                char *tmp = realloc(result, new_len + 1);
+                *buffer = *ft_itoa(shell->last_exit_status);
+                printf("%s" , buffer);
+                size_t old_len = ft_strlen(result);
+                size_t new_len = old_len + ft_strlen(buffer);
+                char *tmp = realloc(result, new_len + 1);//!!!!
                 if (!tmp) {
                     free(result);
                     return NULL;
@@ -29,20 +29,20 @@ char *expand_variable(const char *token, t_shell_state *shell)
                 strcat(result, buffer);
                 p += 2;
             }
-            else if (*(p + 1) && (isalnum(*(p + 1)) || *(p + 1) == '_'))
+            else if (*(p + 1) && (ft_isalnum(*(p + 1)) || *(p + 1) == '_'))
             {
                 // Variable name expansion
                 p++; // $ karakterini atla
                 const char *start = p;
-                while (*p && (isalnum(*p) || *p == '_'))
+                while (*p && (ft_isalnum(*p) || *p == '_'))
                     p++;
                 
-                char *var = strndup(start, p - start);
+                char *var = ft_strndup(start, p - start);
                 char *value = getenv(var);
                 
-                size_t old_len = strlen(result);
-                size_t value_len = value ? strlen(value) : 0;
-                char *tmp = realloc(result, old_len + value_len + 1);
+                size_t old_len = ft_strlen(result);
+                size_t value_len = value ? ft_strlen(value) : 0;
+                char *tmp = realloc(result, old_len + value_len + 1);//!!!!!!
                 if (!tmp) {
                     free(var);
                     free(result);
@@ -56,8 +56,8 @@ char *expand_variable(const char *token, t_shell_state *shell)
             else
             {
                 // $ sonrası geçersiz karakter, $ karakterini olduğu gibi ekle
-                size_t old_len = strlen(result);
-                char *tmp = realloc(result, old_len + 2);
+                size_t old_len = ft_strlen(result);
+                char *tmp = realloc(result, old_len + 2);//!!!!!!
                 if (!tmp) {
                     free(result);
                     return NULL;
@@ -71,7 +71,7 @@ char *expand_variable(const char *token, t_shell_state *shell)
         else
         {
             // Normal karakter
-            size_t old_len = strlen(result);
+            size_t old_len = ft_strlen(result);
             char *tmp = realloc(result, old_len + 2);
             if (!tmp) {
                 free(result);
@@ -84,4 +84,24 @@ char *expand_variable(const char *token, t_shell_state *shell)
         }
     }
     return result;
+}
+
+#include <stdlib.h>
+
+char    *ft_strndup(const char *s, size_t n)
+{
+    char    *dup;
+    size_t  i;
+
+    dup = (char *)malloc(n + 1);
+    if (!dup)
+        return (NULL);
+    i = 0;
+    while (i < n && s[i])
+    {
+        dup[i] = s[i];
+        i++;
+    }
+    dup[i] = '\0';
+    return (dup);
 }

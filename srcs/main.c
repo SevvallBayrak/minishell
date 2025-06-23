@@ -1,5 +1,4 @@
 #include "minishell.h"
-#include "parser.h"
 
 
 // Basit echo implementasyonu
@@ -8,7 +7,7 @@ static void execute_echo(char **tokens) {
     int newline = 1;
     
     // -n flag kontrolü
-    if (tokens[1] && strcmp(tokens[1], "-n") == 0) {
+    if (tokens[1] && ft_strncmp(tokens[1], "-n", ft_strlen(tokens[1])) == 0) {
         newline = 0;
         i = 2;
     }
@@ -33,8 +32,8 @@ static void execute_export(char **tokens, t_shell_state *shell) {
         return;
     }
     
-    char *var = strdup(tokens[1]);
-    char *value = strchr(var, '=');
+    char *var = ft_strdup(tokens[1]);
+    char *value = ft_strchr(var, '=');
     
     if (!value) {
         printf("export: usage: export VAR=value\n");
@@ -57,7 +56,6 @@ static void execute_export(char **tokens, t_shell_state *shell) {
     free(var);
 }
 
-// Basit komut executor
 static void execute_command(char **tokens, t_shell_state *shell) {
     if (!tokens[0])
         return;
@@ -66,10 +64,10 @@ static void execute_command(char **tokens, t_shell_state *shell) {
         execute_echo(tokens);
         shell->last_exit_status = 0;
     }
-    else if (strcmp(tokens[0], "export") == 0) {
+    else if (ft_strncmp(tokens[0], "export", ft_strlen(tokens[0])) == 0) {
         execute_export(tokens, shell);
     }
-    else if (strcmp(tokens[0], "pwd") == 0) {
+    else if (ft_strncmp(tokens[0], "pwd", ft_strlen(tokens[0])) == 0) {
         char cwd[1024];
         if (getcwd(cwd, sizeof(cwd))) {
             printf("%s\n", cwd);
@@ -79,7 +77,7 @@ static void execute_command(char **tokens, t_shell_state *shell) {
             shell->last_exit_status = 1;
         }
     }
-    else if (strcmp(tokens[0], "env") == 0) {
+    else if (ft_strncmp(tokens[0], "env", ft_strlen(tokens[0])) == 0) {
         extern char **environ;
         for (int i = 0; environ[i]; i++)
             printf("%s\n", environ[i]);
@@ -94,7 +92,7 @@ int main(void)
 {
     char *input;
     char **tokens;
-    int i;
+    //int i;
     t_shell_state shell;
     
     // Shell state initialize et
@@ -112,7 +110,7 @@ int main(void)
             add_history(input);
             
         // Exit komutu kontrolü
-        if (strcmp(input, "exit") == 0) {
+        if (ft_strncmp(input, "exit", ft_strlen(input)) == 0) {
             free(input);
             break;
         }
@@ -129,8 +127,8 @@ int main(void)
         tokens = tokenize_input(input, &shell);
         
         // Debug: token'ları göster
-        for (i = 0; tokens[i]; i++)
-            printf("  [%d]: '%s'\n", i, tokens[i]);
+        // for (i = 0; tokens[i]; i++)
+        //     printf("  [%d]: '%s'\n", i, tokens[i]);
         
         // Komutu çalıştır
         execute_command(tokens, &shell);
@@ -142,7 +140,5 @@ int main(void)
     
     cleanup_shell_state(&shell);
     clear_history();
-
-    
     return shell.last_exit_status;
 }

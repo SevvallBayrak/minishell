@@ -6,6 +6,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdbool.h>
+#include "../libft/libft.h"
 #include <unistd.h>
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -26,5 +27,6 @@ int is_special(char c);
 void free_tokens(char **tokens);
 void init_shell_state(t_shell_state *shell);
 void cleanup_shell_state(t_shell_state *shell);
+char    *ft_strndup(const char *s, size_t n);
 
 #endif

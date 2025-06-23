@@ -1,5 +1,4 @@
 #include "minishell.h"
-#include "parser.h"
 
 int check_unclosed_quotes(const char *str)
 {
@@ -31,7 +30,7 @@ static char *copy_quoted_token(const char **str, t_shell_state *shell) {
         len++;
     }
     
-    char *token = strndup(start, len);
+    char *token = ft_strndup(start, len);
     if (**str == quote)
         (*str)++; // Kapanış tırnağını atla
     
@@ -49,10 +48,10 @@ static char *copy_quoted_token(const char **str, t_shell_state *shell) {
 // Normal token kopyalama - variable expansion ile
 static char *copy_normal_token(const char **str, t_shell_state *shell) {
     const char *start = *str;
-    while (**str && !isspace(**str) && !is_special(**str) && **str != '\'' && **str != '"')
+    while (**str && !isspace(**str)/*!!*/ && !is_special(**str) && **str != '\'' && **str != '"')
         (*str)++;
     
-    char *token = strndup(start, *str - start);
+    char *token = ft_strndup(start, *str - start);
     
     // Variable expansion yap
     char *expanded = expand_variable(token, shell);
@@ -62,7 +61,7 @@ static char *copy_normal_token(const char **str, t_shell_state *shell) {
 
 // Güncellenmiş tokenize fonksiyonu
 char **tokenize_input(const char *input, t_shell_state *shell) {
-    char *str = strdup(input);
+    char *str = ft_strdup(input);
     const char *p = str;
     int capacity = 10;
     char **tokens = malloc(capacity * sizeof(char *));
@@ -70,7 +69,7 @@ char **tokenize_input(const char *input, t_shell_state *shell) {
 
     while (*p) {
         // Boşlukları atla
-        while (isspace(*p))
+        while (isspace(*p))//!!!!
             p++;
         
         if (!*p)
@@ -85,11 +84,11 @@ char **tokenize_input(const char *input, t_shell_state *shell) {
         else if (is_special(*p)) {
             // Özel karakterler (pipe, redirection)
             if (*p == '>' && *(p + 1) == '>') {
-                token = strdup(">>");
+                token = ft_strdup(">>");
                 p += 2;
             }
             else if (*p == '<' && *(p + 1) == '<') {
-                token = strdup("<<");
+                token = ft_strdup("<<");
                 p += 2;
             }
             else {
@@ -107,7 +106,7 @@ char **tokenize_input(const char *input, t_shell_state *shell) {
         // Token array'ini genişlet
         if (count >= capacity) {
             capacity *= 2;
-            tokens = realloc(tokens, capacity * sizeof(char *));
+            tokens = realloc(tokens, capacity * sizeof(char *));//!!!
         }
         
         tokens[count++] = token;
