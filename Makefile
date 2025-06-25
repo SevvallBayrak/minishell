@@ -1,7 +1,7 @@
 NAME = minishell
 
 # Source files
-SRCS = srcs/main.c srcs/expand.c srcs/parser.c
+SRCS = srcs/main.c srcs/parser.c srcs/expand.c srcs/command_utils.c
 OBJS = $(SRCS:.c=.o)
 
 # Libft
