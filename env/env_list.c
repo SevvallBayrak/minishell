@@ -1,4 +1,4 @@
-/*#include "../includes/minishell.h"
+#include "../includes/minishell.h"
 
 //AŞKIM BALIM BİTANEEEEMMM<3
 
@@ -14,7 +14,17 @@ t_env	*ft_lstnew_env(char *key, char *value)
 	a->next = NULL;
 	return (a);
 }
+t_env	*ft_lstlast_env(t_env *lst)
+{
+	t_env	*s;
 
+	if (!lst)
+		return (NULL);
+	s = lst;
+	while (s->next)
+		s = s->next;
+	return (s);
+}
 void	ft_lstadd_back_env(t_env **lst, t_env *n)
 {
 	t_env	*s;
@@ -30,17 +40,6 @@ void	ft_lstadd_back_env(t_env **lst, t_env *n)
 	}
 }
 
-t_env	*ft_lstlast_env(t_env *lst)
-{
-	t_env	*s;
-
-	if (!lst)
-		return (NULL);
-	s = lst;
-	while (s->next)
-		s = s->next;
-	return (s);
-}
 // void	ft_lstclear_env(t_list **lst, void (*del)(void*))
 // {
 // 	t_list	*t;

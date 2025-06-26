@@ -2,26 +2,35 @@
 
 int main(int argc, char **argv, char **envp)
 {
-    (void)argc;
-    (void)argv;
-    (void)envp;
+	char        *line;
+	t_data		data;
 
-    setup_signal_handlers(); // burada çağır
+	(void)argc;
+	(void)argv;
+	(void)envp;
 
-    while (1)
-    {
-        char *line = readline("minishell> ");
-        if (!line)
-        {
-            printf("exit\n");
-            break;
-        }
 
-        if (*line)
-            add_history(line);
+	while (1)
+	{
+		line = readline("minishell> ");
 
-        free(line);
-    }
+		if (!line)
+		{
+			printf("exit\n");
+			break;
+		}
 
-    return (0);
+		if (*line)
+			add_history(line);
+
+		if (check_unclosed_quotes(line))
+		{
+			printf("Syntax error: unclosed quotes\n");
+			free(line);
+			continue;
+		}
+		printf("sıkıntı yook");
+	}
+
+	return (0);
 }
