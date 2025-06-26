@@ -12,7 +12,10 @@
 
 NAME        := minishell
 CC          := cc
-CFLAGS      := -Wall -Wextra -Werror -Iincludes -Ilibft -g
+CFLAGS      := -Wall -Wextra -Werror -g \
+               -Iincludes -Ilibft \
+               -I/opt/homebrew/opt/readline/include
+LDFLAGS     := -L/opt/homebrew/opt/readline/lib
 
 SRCS        := $(shell find . -name "*.c" -not -path "./libft/*")
 OBJS        := $(SRCS:.c=.o)
@@ -25,20 +28,20 @@ LIBFT       := $(LIBFTDIR)/libft.a
 all: $(NAME)
 
 $(NAME): $(LIBFT) $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) $(LIBFT) -lreadline -o $(NAME)
+	@$(CC) $(CFLAGS) $(OBJS) $(LIBFT) $(LDFLAGS) -lreadline -o $(NAME)
 	@echo "✅ $(NAME) derlendi."
 
 $(LIBFT):
-	$(MAKE) -C $(LIBFTDIR)
+	@$(MAKE) -C $(LIBFTDIR)
 
 clean:
-	$(MAKE) -C $(LIBFTDIR) clean
-	rm -f $(OBJS)
+	@$(MAKE) -C $(LIBFTDIR) clean
+	@rm -f $(OBJS)
 	@echo "🧹 Temizlik yapıldı."
 
 fclean: clean
-	$(MAKE) -C $(LIBFTDIR) fclean
-	rm -f $(NAME)
+	@$(MAKE) -C $(LIBFTDIR) fclean
+	@rm -f $(NAME)
 	@echo "🧼 Derleme dosyaları silindi."
 
 re: fclean all

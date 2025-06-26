@@ -1,4 +1,4 @@
-#include "../includes/minishell.h"
+/*#include "../includes/minishell.h"
 
 int env_countr(char **env, t_data *data)
 {
@@ -26,4 +26,4 @@ void init_env(t_data *data, char **env)
 		}
 	}
 }
-
+*/

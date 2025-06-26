@@ -1,4 +1,4 @@
-#include "../includes/minishell.h"
+/*#include "../includes/minishell.h"
 
 //AŞKIM BALIM BİTANEEEEMMM<3
 
@@ -56,4 +56,4 @@ t_env	*ft_lstlast_env(t_env *lst)
 // 		t = p;
 // 	}
 // 	*lst = NULL;
-// }
+// }*/

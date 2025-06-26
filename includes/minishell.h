@@ -65,4 +65,6 @@ typedef struct s_data {
     t_env       *env;          // Environment değişken listesi
 } t_data;
 
+void	setup_signal_handlers(void);
+
 #endif
