@@ -1,36 +1,45 @@
-NAME = minishell
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: defcode                                       +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2025/06/24                                 #+#    #+#              #
+#    Updated: 2025/06/24                                 ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
 
-# Source files
-SRCS = srcs/main.c srcs/parser.c srcs/expand.c srcs/command_utils.c
-OBJS = $(SRCS:.c=.o)
+NAME        := minishell
+CC          := cc
+CFLAGS      := -Wall -Wextra -Werror -Iincludes -Ilibft -g
 
-# Libft
-LIBFT_DIR = libft
-LIBFT = $(LIBFT_DIR)/libft.a
+SRCS        := $(shell find . -name "*.c" -not -path "./libft/*")
+OBJS        := $(SRCS:.c=.o)
 
-# Compiler
-CC = cc
-CFLAGS = -Wall -Wextra -Werror -g -Iincludes -I$(LIBFT_DIR)
-LDFLAGS = -lreadline
+LIBFTDIR    := libft
+LIBFT       := $(LIBFTDIR)/libft.a
 
-all: $(LIBFT) $(NAME)
+# --------------------------------------------------
+
+all: $(NAME)
+
+$(NAME): $(LIBFT) $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) $(LIBFT) -lreadline -o $(NAME)
+	@echo "✅ $(NAME) derlendi."
 
 $(LIBFT):
-	@$(MAKE) -C $(LIBFT_DIR)
-
-$(NAME): $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) $(LIBFT) $(LDFLAGS) -o $(NAME)
-
-%.o: %.c includes/minishell.h
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(MAKE) -C $(LIBFTDIR)
 
 clean:
-	@rm -f $(OBJS)
-	@$(MAKE) -C $(LIBFT_DIR) clean
+	$(MAKE) -C $(LIBFTDIR) clean
+	rm -f $(OBJS)
+	@echo "🧹 Temizlik yapıldı."
 
 fclean: clean
-	@rm -f $(NAME)
-	@$(MAKE) -C $(LIBFT_DIR) fclean
+	$(MAKE) -C $(LIBFTDIR) fclean
+	rm -f $(NAME)
+	@echo "🧼 Derleme dosyaları silindi."
 
 re: fclean all
 
