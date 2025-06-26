@@ -1,43 +1,68 @@
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdbool.h>
-#include "../libft/libft.h"
-#include <unistd.h>
-#include <readline/readline.h>
-#include <readline/history.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <unistd.h>
+# include <string.h>
+# include <fcntl.h>
+# include <signal.h>
+# include <readline/readline.h>
+# include <readline/history.h>
 
-// Shell state structure
-typedef struct s_shell_state {
-    int last_exit_status;
-    char **env_vars;  // Custom environment if needed
-} t_shell_state;
+/* ───────────────────────────────────────────── */
+/*              Global Exit Durumu              */
+/* ───────────────────────────────────────────── */
+extern int g_exit_status; // $? değişkeni için global durum
 
-typedef struct s_command {
-    char **args;       // execvp için argüman listesi
-    char *input_file;  // < input.txt
-    char *output_file; // > output.txt
-    bool append;       // >> varsa true
-} t_command;
+/* ───────────────────────────────────────────── */
+/*                 Token Yapıları               */
+/* ───────────────────────────────────────────── */
+typedef enum e_token_type {
+    T_WORD,
+    T_PIPE,
+    T_REDIR_IN,
+    T_REDIR_OUT,
+    T_REDIR_APPEND,
+    T_HEREDOC
+} t_token_type;
 
-// Function prototypes
-int check_unclosed_quotes(const char *str);
-char **tokenize_input(const char *input, t_shell_state *shell);
-char *expand_variable(const char *token, t_shell_state *shell);
-int is_special(char c);
+typedef struct s_token {
+    char            *value;
+    t_token_type    type; 
+   struct s_token  *next;
+} t_token;
 
-// Helper functions
-void free_tokens(char **tokens);
-void init_shell_state(t_shell_state *shell);
-void cleanup_shell_state(t_shell_state *shell);
-char *ft_strndup(const char *s, size_t n);
+/* ───────────────────────────────────────────── */
+/*                Komut Yapısı                  */
+/* ───────────────────────────────────────────── */
+typedef struct s_cmd {
+    char            **argv;
+    char            *infile;
+    char            *outfile;
+    char            *heredoc_delim;
+    int             append;
+    int             is_heredoc;
+    struct s_cmd    *next;
+} t_cmd;
 
-// Yeni command fonksiyonları
-t_command *parse_command_from_tokens(char **tokens);
-void free_command(t_command *cmd);
+/* ───────────────────────────────────────────── */
+/*             Environment Değişkeni            */
+/* ───────────────────────────────────────────── */
+typedef struct s_env {
+    char            *key; // = buraya dahil olucak
+    char            *value;
+    struct s_env    *next;
+} t_env;
+
+/* ───────────────────────────────────────────── */
+/*         Tüm Yapıyı Taşıyan Ana Struct         */
+/* ───────────────────────────────────────────── */
+typedef struct s_data {
+    char        *raw_input;    // Kullanıcının yazdığı ham komut
+    t_token     *tokens;       // Token listesi (lexer çıktısı)
+    t_cmd       *cmds;         // Komutlar listesi (parser çıktısı)
+    t_env       *env;          // Environment değişken listesi
+} t_data;
 
 #endif
