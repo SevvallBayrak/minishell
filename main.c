@@ -5,6 +5,42 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
+
+void	print_cmd_list(t_cmd *cmds)
+{
+	int i;
+	int index = 1;
+
+	while (cmds)
+	{
+		printf("🔹 Command Block %d:\n", index++);
+
+		// Argüman listesi (argv)
+		i = 0;
+		if (cmds->argv)
+		{
+			printf("  argv: ");
+			while (cmds->argv[i])
+				printf("[%s] ", cmds->argv[i++]);
+			printf("\n");
+		}
+		else
+			printf("  argv: (null)\n");
+
+		// Redirection'lar
+		if (cmds->infile)
+			printf("  infile: %s\n", cmds->infile);
+		if (cmds->outfile)
+			printf("  outfile: %s (append=%d)\n", cmds->outfile, cmds->append);
+		if (cmds->is_heredoc)
+			printf("  heredoc_delim: %s\n", cmds->heredoc_delim);
+
+		// Sonraki komuta geç
+		cmds = cmds->next;
+		printf("\n");
+	}
+}
+
 void print_tokens(t_token *tokens)
 {
     while (tokens)
@@ -13,10 +49,11 @@ void print_tokens(t_token *tokens)
         tokens = tokens->next;
     }
 }
-int main(int argc, char **argv, char **envp)
+int	main(int argc, char **argv, char **envp)
 {
-	char    *line;
+	char	*line;
 	t_data	data;
+	t_cmd	*cmds;
 
 	(void)argc;
 	(void)argv;
@@ -31,29 +68,37 @@ int main(int argc, char **argv, char **envp)
 			printf("exit\n");
 			break;
 		}
-
 		if (*line)
 			add_history(line);
 
-		// Tırnak kontrolü (syntax error)
-		// if (check_unclosed_quotes(line))
-		// {
-		// 	printf("Syntax error: unclosed quotes\n");
-		// 	free(line);
-		// 	continue;
-		// }
-
-		// LEXER ÇAĞRISI
+		// Lexer
 		data.tokens = lexer(line);
+		if (!data.tokens)
+		{
+			free(line);
+			continue;
+		}
 
-		// TOKENLARI GÖSTER
+		// Token debug
 		printf("=== Token Listesi ===\n");
 		print_tokens(data.tokens);
 
-		// TOKENLARI TEMİZLE
-		data.tokens = NULL;
+		// Parser
+		cmds = parse_tokens(data.tokens);
+		if (!cmds)
+		{
+			free_token_list(data.tokens);
+			free(line);
+			continue;
+		}
 
-		// LINE’I TEMİZLE
+		// Cmd debug
+		printf("=== Komut Listesi ===\n");
+		print_cmd_list(cmds);
+
+		// Cleanup
+		free_token_list(data.tokens);
+		// free_cmd_list(cmds);  ← Hatırlatma: Bunu daha sonra yazacaksın
 		free(line);
 	}
 	return (0);

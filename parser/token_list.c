@@ -43,3 +43,24 @@ void	free_token_list(t_token *list)
 		list = temp;
 	}
 }
+void	free_str_array(char **arr)
+{
+	int i = 0;
+
+	if (!arr)
+		return;
+	while (arr[i])
+	{
+		free(arr[i]);
+		i++;
+	}
+	free(arr);
+}
+t_cmd	*init_new_cmd(void)
+{
+	t_cmd *cmd = malloc(sizeof(t_cmd));
+	if (!cmd)
+		return (NULL);
+	ft_bzero(cmd, sizeof(t_cmd));
+	return (cmd);
+}

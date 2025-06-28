@@ -2,6 +2,42 @@
 #include "utils.h"
 #include "parser.h"
 
+int print_no_red_next_word_error(t_token *next)
+{
+	if (!next || next->type != T_WORD)
+	{
+		write(2, "minishell: syntax error near unexpected token `newline'\n", 57);
+		return (0);
+	}
+    return (1);
+}
+int	handle_redirection_token(t_cmd *cmd, t_token **tok)
+{
+	t_token *next = (*tok)->next;
+
+	if (!(print_no_red_next_word_error(next)))
+        return(0);
+	if ((*tok)->type == T_REDIR_IN)
+		cmd->infile = strdup(next->value);
+	else if ((*tok)->type == T_REDIR_OUT)
+	{
+		cmd->outfile = strdup(next->value);
+		cmd->append = 0;
+	}
+	else if ((*tok)->type == T_REDIR_APPEND)
+	{
+		cmd->outfile = strdup(next->value);
+		cmd->append = 1;
+	}
+	else if ((*tok)->type == T_HEREDOC)
+	{
+		cmd->heredoc_delim = strdup(next->value);
+		cmd->is_heredoc = 1;
+	}
+	*tok = next;
+	return (1);
+}
+
 int	handle_pipe_token(t_cmd **current)
 {
 	(*current)->next = malloc(sizeof(t_cmd));
@@ -39,19 +75,7 @@ char	**append_str_to_array(char **arr, char *new_str)
 	free_str_array(arr); // hem pointer hem içerikler temizlenir
 	return (new_arr);
 }
-void	free_str_array(char **arr)
-{
-	int i = 0;
 
-	if (!arr)
-		return;
-	while (arr[i])
-	{
-		free(arr[i]);
-		i++;
-	}
-	free(arr);
-}
 t_cmd *parse_tokens(t_token *tokens)
 {
 	t_cmd *cmds = NULL;
@@ -73,9 +97,9 @@ t_cmd *parse_tokens(t_token *tokens)
 			if (!handle_pipe_token(&current))
 				return (NULL);
 		}
-        //burası yapılmadı
 		else if (tokens->type >= T_REDIR_IN && tokens->type <= T_HEREDOC)
-			handle_redirection_token(current, &tokens);
+	        if (!(handle_redirection_token(current, &tokens))) // syntax error olduysa dur
+		        return (NULL);
 		tokens = tokens->next;
 	}
 	return (cmds);

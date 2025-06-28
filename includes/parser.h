@@ -29,6 +29,8 @@ void add_token(t_token **list, char *value, int type);
 int dispatch_lexer(char *input, int i, t_token **tokens);
 void	free_token_list(t_token *list);
 t_cmd *parse_tokens(t_token *tokens);
+void	free_str_array(char **arr);
+t_cmd	*init_new_cmd(void);
 
 int check_unclosed_quotes(const char *str);
 
