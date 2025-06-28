@@ -9,17 +9,14 @@ int main(int argc, char **argv, char **envp)
 	(void)argv;
 	(void)envp;
 
-
 	while (1)
 	{
 		line = readline("minishell> ");
-
 		if (!line)
 		{
 			printf("exit\n");
 			break;
 		}
-
 		if (*line)
 			add_history(line);
 
@@ -31,6 +28,5 @@ int main(int argc, char **argv, char **envp)
 		}
 		printf("sıkıntı yook");
 	}
-
 	return (0);
 }

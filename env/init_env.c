@@ -12,3 +12,7 @@ void init_env(t_data *data, char **env)
 		ft_lstaddback_env(ft_lstnew_env(tmp[1], tmp[2]));
 	}
 }
+int main(int argc, char **argv, char **env)
+{
+	
+}
