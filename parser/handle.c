@@ -18,10 +18,6 @@ int	handle_word(char *input, t_token **tokens, int i)
 	}
 	return (i - start); // Kaç karakter ilerledik
 }
-
-#include "minishell.h"
-#include <stdlib.h>
-
 int handle_quote(char *input, t_token **tokens, int i)
 {
     int     start;

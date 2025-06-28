@@ -4,7 +4,7 @@
 
 int dispatch_lexer(char *input, int i, t_token **tokens)
 {
-	int step;
+	int step = 0;
 
 	if (input[i] == '\'' || input[i] == '"')
 	{
@@ -12,12 +12,17 @@ int dispatch_lexer(char *input, int i, t_token **tokens)
 		if (step == 0)
 			return (-1); // hata
 	}
+	else if (input[i] == '|')
+	{
+    	add_token(tokens, "|", T_PIPE);
+    	step += 1;
+	}
 	else if (is_operator(input[i]))
 	{
-        step = handle_redirection(input, tokens, i);
-        if (step == 0)
+		step = handle_redirection(input, tokens, i);
+		if (step == 0)
 			return (-1);
-    }
+	}
 	else
 		step = handle_word(input, tokens, i);
 
@@ -27,7 +32,7 @@ t_token *lexer(char *input)
 {
 	t_token *tokens = NULL;
 	int i = 0;
-	int step;
+	int step = 0;
 
 	while (input[i])
 	{
@@ -38,9 +43,9 @@ t_token *lexer(char *input)
 			step = dispatch_lexer(input, i, &tokens);
 			if (step == -1)
 			{
-                free_token_list(tokens);
-                return (NULL);
-            }
+				free_token_list(tokens);
+				return (NULL);
+			}
 			i += step;
 		}
 	}
