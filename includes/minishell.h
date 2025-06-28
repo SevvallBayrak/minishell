@@ -40,13 +40,13 @@ typedef struct s_token {
 /*                Komut Yapısı                  */
 /* ───────────────────────────────────────────── */
 typedef struct s_cmd {
-    char            **argv;
-    char            *infile;
-    char            *outfile;
-    char            *heredoc_delim;
-    int             append;
-    int             is_heredoc;
-    struct s_cmd    *next;
+    char            **argv; // Argüman listesi: ["ls", "-l", NULL]
+    char            *infile; // input redirection dosyası (örnek: < input.txt)
+    char            *outfile; // output redirection dosyası (örnek: > out.txt)
+    char            *heredoc_delim; // << EOF → buraya delimiter yazılır
+    int             append; //	>> file.txt varsa 1, > ise 0
+    int             is_heredoc; //	<< varsa 1, yoksa 0
+    struct s_cmd    *next; // 	Pipe varsa 
 } t_cmd;
 
 /* ───────────────────────────────────────────── */

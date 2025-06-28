@@ -1,6 +1,9 @@
 #include "minishell.h"
 #include "utils.h"
 #include "parser.h"
+#include "minishell.h"
+#include <unistd.h> // write için
+
 
 int dispatch_lexer(char *input, int i, t_token **tokens)
 {
