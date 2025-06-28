@@ -30,3 +30,16 @@ void add_token(t_token **list, char *value, int type)
         temp = temp->next;
     temp->next = new;
 }
+
+void	free_token_list(t_token *list)
+{
+	t_token	*temp;
+
+	while (list)
+	{
+		temp = list->next;
+		free(list->value);
+		free(list);
+		list = temp;
+	}
+}

@@ -9,7 +9,7 @@ void print_tokens(t_token *tokens)
 {
     while (tokens)
     {
-        printf("Token → Type: %d, Value: \"%s\"\n", tokens->type, tokens->value);
+        printf("Token → Type: %d, Value: %s\n", tokens->type, tokens->value);
         tokens = tokens->next;
     }
 }
@@ -36,12 +36,12 @@ int main(int argc, char **argv, char **envp)
 			add_history(line);
 
 		// Tırnak kontrolü (syntax error)
-		if (check_unclosed_quotes(line))
-		{
-			printf("Syntax error: unclosed quotes\n");
-			free(line);
-			continue;
-		}
+		// if (check_unclosed_quotes(line))
+		// {
+		// 	printf("Syntax error: unclosed quotes\n");
+		// 	free(line);
+		// 	continue;
+		// }
 
 		// LEXER ÇAĞRISI
 		data.tokens = lexer(line);

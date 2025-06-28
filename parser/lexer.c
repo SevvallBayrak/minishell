@@ -1,65 +1,48 @@
-// #include "parser.h"
-
-// void lexer(const char *line)
-// {
-//     int i = 0;
-
-//     while (line[i])
-//     {
-//         // Her karakteri sırayla işleyebilirsin
-//         // Örneğin boşluk atla:
-//         if (line[i] == ' ')
-//         {
-//             i++;
-//             continue;
-//         }
-//         while (line[i])
-//         {
-//         }
-//         // Diğer durumlar için şimdilik debug bastır:
-//         printf("karakter: %c\n", line[i]);
-//         i++;
-//     }
-// }
-
-// #include "parser.h"
-// #include <stdlib.h>
-// #include <string.h>
-
-// t_token	*new_token(t_token_type type, const char *value)
-// {
-//     t_token	*token;
-
-//     token = malloc(sizeof(t_token));
-//     if (!token)
-//         return (NULL);
-//     token->type = type;
-//     token->value = strdup(value); // value'yu kopyalıyoruz
-//     token->next = NULL;
-//     return (token);
-// }
-
-
 #include "minishell.h"
 #include "utils.h"
 #include "parser.h"
 
+int dispatch_lexer(char *input, int i, t_token **tokens)
+{
+	int step;
+
+	if (input[i] == '\'' || input[i] == '"')
+	{
+		step = handle_quote(input, tokens, i);
+		if (step == 0)
+			return (-1); // hata
+	}
+	else if (is_operator(input[i]))
+	{
+        step = handle_redirection(input, tokens, i);
+        if (step == 0)
+			return (-1);
+    }
+	else
+		step = handle_word(input, tokens, i);
+
+	return (step);
+}
 t_token *lexer(char *input)
 {
-    t_token *tokens = NULL;
-    int i = 0;
+	t_token *tokens = NULL;
+	int i = 0;
+	int step;
 
-    while (input[i])
-    {
-        if (isspace(input[i]))
-            i++;
-        else if (input[i] == '\'' || input[i] == '"')
-            i += handle_quote(input, &tokens, i); // quote içinde
-        else if (is_operator(input[i]))
-            i += handle_redirection(input, &tokens, i);
-        else
-            i += handle_word(input, &tokens, i);
-    }
-    return tokens;
+	while (input[i])
+	{
+		if (ft_isspace(input[i]))
+			i++;
+		else
+		{
+			step = dispatch_lexer(input, i, &tokens);
+			if (step == -1)
+			{
+                free_token_list(tokens);
+                return (NULL);
+            }
+			i += step;
+		}
+	}
+	return tokens;
 }
-

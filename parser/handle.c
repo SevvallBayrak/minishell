@@ -45,13 +45,30 @@ int handle_quote(char *input, t_token **tokens, int i)
         return (0);
     add_token(tokens, word, T_WORD);
     free(word);
-
     return (i - start + 2); // +1 tırnak, +1 başta artırmıştık
 }
 
 
+int	is_invalid_redir(const char *input, int i)
+{
+	if (input[i] == '<' && input[i + 1] == '<' && input[i + 2] == '<')
+	{
+		write(2, "minishell: syntax error\n", 54);
+		return (1);
+	}
+	if (input[i] == '>' && input[i + 1] == '>' && input[i + 2] == '>')
+	{
+		write(2, "minishell: syntax error\n", 54);
+		return (1);
+	}
+	return (0);
+}
 int handle_redirection(char *input, t_token **tokens, int i)
 {
+	// handle_redirection içinde:
+	if (is_invalid_redir(input, i))
+		return (0);
+
 	if (input[i] == '>' && input[i + 1] == '>')
 	{
 		add_token(tokens, ">>", T_REDIR_APPEND);
@@ -74,3 +91,4 @@ int handle_redirection(char *input, t_token **tokens, int i)
 	}
 	return (0); // geçerli değilse (teorik olarak gerekmez)
 }
+
