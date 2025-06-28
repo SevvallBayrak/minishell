@@ -44,6 +44,25 @@
 #include <stdlib.h>
 #include <string.h>
 
+t_token *lexer(char *input)
+{
+    t_token *tokens = NULL;
+    int i = 0;
+
+    while (input[i])
+    {
+        if (isspace(input[i]))
+            i++;
+        else if (input[i] == '\'' || input[i] == '"')
+            i += handle_quote(input, i, input[i]); // quote içinde
+        else if (is_operator(input[i]))
+            i += handle_redirection(input, &tokens, i);
+        else
+            i += handle_word(input, &tokens, i);
+    }
+    return tokens;
+}
+
 t_token *create_token(char *value, int type)
 {
     t_token *new = malloc(sizeof(t_token));
