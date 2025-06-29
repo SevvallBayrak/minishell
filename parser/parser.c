@@ -18,20 +18,20 @@ int	handle_redirection_token(t_cmd *cmd, t_token **tok)
 	if (!(print_no_red_next_word_error(next)))
         return(0);
 	if ((*tok)->type == T_REDIR_IN)
-		cmd->infile = strdup(next->value);
+		cmd->infile = ft_strdup(next->value);
 	else if ((*tok)->type == T_REDIR_OUT)
 	{
-		cmd->outfile = strdup(next->value);
+		cmd->outfile = ft_strdup(next->value);
 		cmd->append = 0;
 	}
 	else if ((*tok)->type == T_REDIR_APPEND)
 	{
-		cmd->outfile = strdup(next->value);
+		cmd->outfile = ft_strdup(next->value);
 		cmd->append = 1;
 	}
 	else if ((*tok)->type == T_HEREDOC)
 	{
-		cmd->heredoc_delim = strdup(next->value);
+		cmd->heredoc_delim = ft_strdup(next->value);
 		cmd->is_heredoc = 1;
 	}
 	*tok = next;
@@ -66,13 +66,13 @@ char	**append_str_to_array(char **arr, char *new_str)
 
 	// eskileri kopyala (strdup ile!)
 	while (++i < len)
-	new_arr[i] = strdup(arr[i]);
+	new_arr[i] = ft_strdup(arr[i]);
 
 	// yeniyi ekle
-	new_arr[len] = strdup(new_str);
+	new_arr[len] = ft_strdup(new_str);
 	new_arr[len + 1] = NULL;
 
-	free_str_array(arr); // hem pointer hem içerikler temizlenir
+	free(arr); // hem pointer hem içerikler temizlenir
 	return (new_arr);
 }
 

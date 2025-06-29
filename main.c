@@ -5,6 +5,46 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
+#include <stdlib.h>
+
+void free_argv(char **argv)
+{
+    int i = 0;
+    if (!argv)
+        return;
+    while (argv[i])
+    {
+        free(argv[i]);
+        i++;
+    }
+    free(argv);
+}
+
+void free_cmd_list(t_cmd *cmd)
+{
+    t_cmd *tmp;
+
+    while (cmd)
+    {
+        tmp = cmd->next;
+
+        // argv dizisini serbest bırak
+        free_argv(cmd->argv);
+
+        // infile, outfile ve heredoc_delim varsa serbest bırak
+        if (cmd->infile)
+            free(cmd->infile);
+        if (cmd->outfile)
+            free(cmd->outfile);
+        if (cmd->heredoc_delim)
+            free(cmd->heredoc_delim);
+
+        // cmd yapısını serbest bırak
+        free(cmd);
+
+        cmd = tmp;
+    }
+}
 
 void	print_cmd_list(t_cmd *cmds)
 {
@@ -95,10 +135,11 @@ int	main(int argc, char **argv, char **envp)
 		// Cmd debug
 		printf("=== Komut Listesi ===\n");
 		print_cmd_list(cmds);
+	
 
 		// Cleanup
 		free_token_list(data.tokens);
-		// free_cmd_list(cmds);  ← Hatırlatma: Bunu daha sonra yazacaksın
+		// free_cmd_list(cmds); 
 		free(line);
 	}
 	return (0);

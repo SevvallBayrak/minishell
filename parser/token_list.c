@@ -7,7 +7,7 @@ t_token *create_token(char *value, int type)
     t_token *new = malloc(sizeof(t_token));
     if (!new)
         return (NULL);
-    new->value = strdup(value);  // value'nun kopyasını al
+    new->value = ft_strdup(value);  // value'nun kopyasını al
     new->type = type;
     new->next = NULL;
     return (new);
