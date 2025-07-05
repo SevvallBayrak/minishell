@@ -16,3 +16,78 @@
 // {
 	
 // }
+
+#include "minishell.h"
+
+void	ft_free_split(char **split)
+{
+	int	i;
+
+	if (!split)
+		return ;
+	i = 0;
+	while (split[i])
+	{
+		free(split[i]);
+		i++;
+	}
+	free(split);
+}
+
+void	env_add_back(t_env **env, t_env *new_node)
+{
+	t_env	*tmp;
+
+	if (!env || !new_node)
+		return ;
+	if (!*env)
+	{
+		*env = new_node;
+		return ;
+	}
+	tmp = *env;
+	while (tmp->next)
+		tmp = tmp->next;
+	tmp->next = new_node;
+}
+
+void	init_env(t_data *data, char **envp)
+{
+	load_env_from_envp(data, envp);
+	ensure_pwd_exists(data);
+}
+
+void	load_env_from_envp(t_data *data, char **envp)
+{
+	int		i = -1;
+	char	**tmp;
+	t_env	*node;
+
+	while (envp[++i])
+	{
+		tmp = ft_split(envp[i], '=');
+		if (!tmp)
+			continue;
+		node = malloc(sizeof(t_env));
+		if (!node)
+		{
+			ft_free_split(tmp);
+			continue;
+		}
+		node->key = ft_strdup(tmp[0]);
+		node->value = tmp[1] ? ft_strdup(tmp[1]) : NULL;
+		node->next = NULL;
+		env_add_back(&data->env, node);
+		ft_free_split(tmp);
+	}
+}
+void	ensure_pwd_exists(t_data *data)
+{
+	char cwd[1024];
+
+	if (!get_env_value(data->env, "PWD"))
+	{
+		if (getcwd(cwd, sizeof(cwd)))
+			update_env_var(data, "PWD", cwd);
+	}
+}

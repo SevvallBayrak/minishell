@@ -69,5 +69,33 @@ typedef struct s_data {
 } t_data;
 
 void	setup_signal_handlers(void);
+int is_builtin(const char *cmd);
+int exec_builtin(t_cmd *cmd, t_data *data);
+int ft_echo(char **args);
+int ft_cd(char **args, t_data *data);
+int ft_pwd(t_data *data);
+int	ft_isnumeric(const char *str);
+int is_valid_identifier(const char *str);
+t_env *find_env(t_env *env, const char *key);
+void add_or_update_env(t_data *data, const char *key, const char *value);
+int ft_export(char **argv, t_data *data);
+int ft_unset(char **argv, t_data *data);
+int ft_env(t_data *data);
+int is_numeric(const char *str);
+int ft_exit(char **argv, t_data *data);
+int executor_execute(t_cmd *cmds, t_data *data);
+char    *get_env_value(t_env *env, const char *key);
+void    update_env_var(t_data *data, const char *key, const char *value);
+void env_add_back(t_env **env, t_env *new_node);
+void	init_env(t_data *data, char **envp);
+void	load_env_from_envp(t_data *data, char **envp);
+void	ensure_pwd_exists(t_data *data);
+void remove_env_var(t_env **env, const char *key);
+char **env_to_envp(t_env *env);
+void free_argv(char **argv);
+void execute_command(char **argv, t_data *data);
+char *ft_strjoin_path(const char *dir, const char *cmd);
+
+
 
 #endif

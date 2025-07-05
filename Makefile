@@ -1,21 +1,10 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: defcode                                       +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2025/06/24                                 #+#    #+#              #
-#    Updated: 2025/06/24                                 ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
 NAME        := minishell
 CC          := cc
 CFLAGS      := -Wall -Wextra -Werror -g \
                -Iincludes -Ilibft \
                -I/opt/homebrew/opt/readline/include
 LDFLAGS     := -L/opt/homebrew/opt/readline/lib
+LDLIBS      := -lreadline
 
 SRCS        := $(shell find . -name "*.c" -not -path "./libft/*")
 OBJS        := $(SRCS:.c=.o)
@@ -28,7 +17,7 @@ LIBFT       := $(LIBFTDIR)/libft.a
 all: $(NAME)
 
 $(NAME): $(LIBFT) $(OBJS)
-	@$(CC) $(CFLAGS) $(OBJS) $(LIBFT) $(LDFLAGS) -lreadline -o $(NAME)
+	@$(CC) $(CFLAGS) $(OBJS) $(LIBFT) $(LDFLAGS) $(LDLIBS) -o $(NAME)
 	@echo "✅ $(NAME) derlendi."
 
 $(LIBFT):

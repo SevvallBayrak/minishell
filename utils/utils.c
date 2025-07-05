@@ -29,3 +29,20 @@ int is_operator(char c)
 {
     return (c == '>' || c == '<' || c == '|');
 }
+
+char *ft_strjoin_path(const char *dir, const char *cmd)
+{
+    char    *res;
+    size_t  len;
+
+    if (!dir || !cmd)
+        return (NULL);
+    len = ft_strlen(dir) + ft_strlen(cmd) + 2; // '/' ve '\0' için
+    res = malloc(len);
+    if (!res)
+        return (NULL);
+    ft_strlcpy(res, dir, len);
+    ft_strlcat(res, "/", len);
+    ft_strlcat(res, cmd, len);
+    return (res);
+}

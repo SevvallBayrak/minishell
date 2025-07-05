@@ -6,6 +6,8 @@
 #include <readline/history.h>
 
 #include <stdlib.h>
+int g_exit_status = 0;
+
 
 void free_argv(char **argv)
 {
@@ -97,8 +99,13 @@ int	main(int argc, char **argv, char **envp)
 
 	(void)argc;
 	(void)argv;
-	(void)envp;
 	data.tokens = NULL;
+	data.env = NULL; // Env başta boş
+
+	init_env(&data, envp); // ✅ ENV LİSTESİNİ BURADA OLUŞTURUYORSUN
+
+	// İstersen debug için şunu yaz:
+	// ft_env_print(&data);
 
 	while (1)
 	{
@@ -135,7 +142,9 @@ int	main(int argc, char **argv, char **envp)
 		// Cmd debug
 		printf("=== Komut Listesi ===\n");
 		print_cmd_list(cmds);
-	
+
+		// Komutu çalıştır
+		executor_execute(cmds, &data);
 
 		// Cleanup
 		free_token_list(data.tokens);
@@ -144,3 +153,4 @@ int	main(int argc, char **argv, char **envp)
 	}
 	return (0);
 }
+
