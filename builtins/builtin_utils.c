@@ -14,8 +14,6 @@ int is_builtin(const char *cmd)
         ft_strncmp(cmd, "exit", 5) == 0
     );
 }
-#include "builtin.h"
-
 int exec_builtin(t_cmd *cmd, t_data *data)
 {
     if (!cmd || !cmd->argv || !cmd->argv[0])

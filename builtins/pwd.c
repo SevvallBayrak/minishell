@@ -3,15 +3,17 @@
 
 int ft_pwd(t_data *data)
 {
-    char *pwd = get_env_value(data->env, "PWD");
+    char cwd[1024];
 
-    if (!pwd)
+    (void)data;
+
+    if (!getcwd(cwd, sizeof(cwd)))
     {
-        write(2, "pwd: PWD not set\n", 18);
+        perror("pwd");
         return 1;
     }
-    write(1, pwd, ft_strlen(pwd));
+
+    write(1, cwd, ft_strlen(cwd));
     write(1, "\n", 1);
     return 0;
 }
-

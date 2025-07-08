@@ -49,7 +49,8 @@ void	process_export_arg(char *arg, t_data *data)
 		write(2, "export: not a valid identifier\n", 31);
 		return;
 	}
-	update_env_var(data, key, value);
+	if (key && value)
+		update_env_var(data, key, value);
 }
 
 int is_valid_key(const char *key)

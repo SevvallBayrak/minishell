@@ -54,7 +54,7 @@ void	env_add_back(t_env **env, t_env *new_node)
 void	init_env(t_data *data, char **envp)
 {
 	load_env_from_envp(data, envp);
-	ensure_pwd_exists(data);
+	//ensure_pwd_exists(data);
 }
 
 void	load_env_from_envp(t_data *data, char **envp)
@@ -75,13 +75,16 @@ void	load_env_from_envp(t_data *data, char **envp)
 			continue;
 		}
 		node->key = ft_strdup(tmp[0]);
-		node->value = tmp[1] ? ft_strdup(tmp[1]) : NULL;
+		if (tmp[1])
+	        node->value = ft_strdup(tmp[1]);
+        else
+	        node->value = NULL;
 		node->next = NULL;
 		env_add_back(&data->env, node);
 		ft_free_split(tmp);
 	}
 }
-void	ensure_pwd_exists(t_data *data)
+/*void	ensure_pwd_exists(t_data *data)
 {
 	char cwd[1024];
 
@@ -90,4 +93,4 @@ void	ensure_pwd_exists(t_data *data)
 		if (getcwd(cwd, sizeof(cwd)))
 			update_env_var(data, "PWD", cwd);
 	}
-}
+}*/

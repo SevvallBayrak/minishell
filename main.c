@@ -103,9 +103,10 @@ int	main(int argc, char **argv, char **envp)
 	data.env = NULL; // Env başta boş
 
 	init_env(&data, envp); // ✅ ENV LİSTESİNİ BURADA OLUŞTURUYORSUN
+	setup_signal_handlers();
 
 	// İstersen debug için şunu yaz:
-	// ft_env_print(&data);
+	//ft_env_print(&data);
 
 	while (1)
 	{
@@ -142,7 +143,6 @@ int	main(int argc, char **argv, char **envp)
 		// Cmd debug
 		printf("=== Komut Listesi ===\n");
 		print_cmd_list(cmds);
-
 		// Komutu çalıştır
 		executor_execute(cmds, &data);
 
