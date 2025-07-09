@@ -117,7 +117,7 @@ int	main(int argc, char **argv, char **envp)
 			add_history(line);
 
 		// Lexer
-		data.tokens = lexer(line);
+		data.tokens = lexer(line, &data);
 		if (!data.tokens)
 		{
 			free(line);
@@ -129,7 +129,7 @@ int	main(int argc, char **argv, char **envp)
 			free(line);
 			continue;
 		}
-		expand_token(data.env, data.tokens, data.exit_status);
+		expand_tokens(data.env, data.tokens, data.exit_status);
 
 		// Token debug
 		// printf("=== Token Listesi ===\n");

@@ -21,12 +21,12 @@
 // } t_token;
 
 int	handle_word(char *input, t_token **tokens, int i);
-int handle_quote(char *input, t_token **tokens, int i);
-int handle_redirection(char *input, t_token **tokens, int i);
-t_token *lexer(char *input);
+int handle_quote(char *input, t_token **tokens, int i, t_data *data);
+int handle_redirection(char *input, t_token **tokens, int i, t_data *data);
+t_token *lexer(char *input, t_data *data);
 void add_token(t_token **list, char *value, int type, int quote);
 t_token *create_token(char *value, int type, int quote);
-int dispatch_lexer(char *input, int i, t_token **tokens);
+int dispatch_lexer(char *input, int i, t_token **tokens, t_data *data);
 void	free_token_list(t_token *list);
 t_cmd *parse_tokens(t_token *tokens);
 void	free_str_array(char **arr);

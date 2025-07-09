@@ -38,31 +38,35 @@ static void	append_and_replace(char **result, char *addition)
 
 char *expand_variable(t_env *env, char *str, int exit_status)
 {
-	int i = -1, j;
-	char *result = ft_strdup("");
-	char *prefix, *key;
+	int		i = 0;
+	int		j;
+	char	*result = ft_strdup("");
+	char	*prefix;
+	char	*key;
 
-	while (str[++i])
+	while (str[i])
 	{
 		if (str[i] == '$' && str[i + 1] &&
 			(ft_isalnum(str[i + 1]) || str[i + 1] == '_' || str[i + 1] == '?'))
 		{
-			if (i > 0)
-			{
-				prefix = ft_substr(str, 0, i);
-				append_and_replace(&result, prefix);
-				free(prefix);
-			}
-			key = expand_key(env, str, i, &j, exit_status);
+			prefix = ft_substr(str, 0, i); // $'tan önceki kısmı al
+			append_and_replace(&result, prefix);
+			free(prefix);
+
+			key = expand_key(env, str, i, &j, exit_status); // $VAR ya da $?
 			append_and_replace(&result, key);
 			free(key);
-			str = str + j;
-			i = 0;
+
+			str += j; // işlenen kısmı atla
+			i = 0; // yeni str'de sıfırdan başla
 		}
+		else
+			i++;
 	}
-	append_and_replace(&result, str);
+	append_and_replace(&result, str); // kalan kısmı ekle
 	return (result);
 }
+
 
 void expand_tokens(t_env *env, t_token *tokens, int exit_status)
 {

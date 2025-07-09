@@ -1,28 +1,26 @@
 #include "minishell.h"
 #include "utils.h"
 #include "parser.h"
-#include "minishell.h"
 #include <unistd.h> // write için
 
-
-int dispatch_lexer(char *input, int i, t_token **tokens)
+int dispatch_lexer(char *input, int i, t_token **tokens, t_data *data)
 {
 	int step = 0;
 
 	if (input[i] == '\'' || input[i] == '"')
 	{
-		step = handle_quote(input, tokens, i);
+		step = handle_quote(input, tokens, i, data);
 		if (step == 0)
 			return (-1); // hata
 	}
 	else if (input[i] == '|')
 	{
-    	add_token(tokens, "|", T_PIPE, 2);
-    	step += 1;
+		add_token(tokens, "|", T_PIPE, 2);
+		step += 1;
 	}
 	else if (is_operator(input[i]))
 	{
-		step = handle_redirection(input, tokens, i);
+		step = handle_redirection(input, tokens, i, data);
 		if (step == 0)
 			return (-1);
 	}
@@ -31,7 +29,8 @@ int dispatch_lexer(char *input, int i, t_token **tokens)
 
 	return (step);
 }
-t_token *lexer(char *input)
+
+t_token *lexer(char *input, t_data *data)
 {
 	t_token *tokens = NULL;
 	int i = 0;
@@ -43,7 +42,7 @@ t_token *lexer(char *input)
 			i++;
 		else
 		{
-			step = dispatch_lexer(input, i, &tokens);
+			step = dispatch_lexer(input, i, &tokens, data);
 			if (step == -1)
 			{
 				free_token_list(tokens);
