@@ -49,12 +49,12 @@ int	is_invalid_redir(const char *input, int i)
 {
 	if (input[i] == '<' && input[i + 1] == '<' && input[i + 2] == '<')
 	{
-		write(2, "minishell: syntax error\n", 54);
+		write(2, "minishell: syntax error\n", 25);
 		return (1);
 	}
 	if (input[i] == '>' && input[i + 1] == '>' && input[i + 2] == '>')
 	{
-		write(2, "minishell: syntax error\n", 54);
+		write(2, "minishell: syntax error\n", 25);
 		return (1);
 	}
 	return (0);

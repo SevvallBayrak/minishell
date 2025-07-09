@@ -105,9 +105,6 @@ int	main(int argc, char **argv, char **envp)
 	init_env(&data, envp); // ✅ ENV LİSTESİNİ BURADA OLUŞTURUYORSUN
 	setup_signal_handlers();
 
-	// İstersen debug için şunu yaz:
-	//ft_env_print(&data);
-
 	while (1)
 	{
 		line = readline("minishell> ");
@@ -123,6 +120,12 @@ int	main(int argc, char **argv, char **envp)
 		data.tokens = lexer(line);
 		if (!data.tokens)
 		{
+			free(line);
+			continue;
+		}
+		if (!validate_syntax(data.tokens))
+		{
+			free_token_list(data.tokens);
 			free(line);
 			continue;
 		}
