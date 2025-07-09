@@ -1,10 +1,10 @@
 #include "minishell.h"
 
-char *expand_exit_status(char *str, int pos, int exit_status)
-{
-	char *status = ft_itoa(exit_status);
-	// ...
-}
+// char *expand_exit_status(char *str, int pos, int exit_status)
+// {
+// 	char *status = ft_itoa(exit_status);
+// 	// ...
+// }
 
 static char *expand_key(t_env *env, char *str, int i, int *j, int exit_status)
 {

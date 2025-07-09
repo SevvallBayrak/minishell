@@ -123,12 +123,13 @@ int	main(int argc, char **argv, char **envp)
 			free(line);
 			continue;
 		}
-		if (!validate_syntax(data.tokens))
+		if (!validate_syntax(data.tokens, &data))
 		{
 			free_token_list(data.tokens);
 			free(line);
 			continue;
 		}
+		expand_token(data.env, data.tokens, data.exit_status);
 
 		// Token debug
 		printf("=== Token Listesi ===\n");

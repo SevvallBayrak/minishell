@@ -33,6 +33,7 @@ void	free_str_array(char **arr);
 t_cmd	*init_new_cmd(void);
 
 int check_unclosed_quotes(const char *str);
+int	validate_syntax(t_token *tok, t_data *data);
 
 
 

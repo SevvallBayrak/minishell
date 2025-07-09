@@ -1,4 +1,5 @@
 #include <minishell.h>
+#include <errno.h>
 
 int executor_execute(t_cmd *cmds, t_data *data)
 {
@@ -13,24 +14,11 @@ int executor_execute(t_cmd *cmds, t_data *data)
     return (0);
 }
 
-char *get_command_path(char *cmd, t_data *data)
+static char *search_path_dirs(char *path_env, char *cmd)
 {
-    int     i = 0, j = 0;
-    char    *path_env;
-    char    *dir;
-    char    *full_path;
+    int i = 0, j;
+    char *dir, *full_path;
 
-    if (!cmd)
-        return (NULL);
-    if (cmd[0] == '/' || (cmd[0] == '.' && cmd[1] == '/'))
-    {
-        if (access(cmd, X_OK) == 0)
-            return (ft_strdup(cmd));
-        return (NULL);
-    }
-    path_env = get_env_value(data->env, "PATH");
-    if (!path_env)
-        return (NULL);
     while (path_env[i])
     {
         while (path_env[i] == ':')
@@ -48,51 +36,81 @@ char *get_command_path(char *cmd, t_data *data)
     }
     return (NULL);
 }
+char *get_command_path(char *cmd, t_data *data)
+{
+    char *path_env;
+
+    if (!cmd)
+        return (NULL);
+    if (cmd[0] == '/' || (cmd[0] == '.' && cmd[1] == '/'))
+    {
+        if (access(cmd, X_OK) == 0)
+            return (ft_strdup(cmd));
+        return (NULL);
+    }
+
+    path_env = get_env_value(data->env, "PATH");
+    if (!path_env)
+        return (NULL);
+    return search_path_dirs(path_env, cmd);
+}
+
+void run_child_process(char **argv, char **envp, t_data *data)
+{
+    char *path = get_command_path(argv[0], data);
+
+    if (!path)
+    {
+        write(2, "Command not found\n", 18);
+        free_argv(envp);
+        exit(127); // Komut bulunamadı
+    }
+
+    // İzin kontrolü
+    if (access(path, X_OK) != 0)
+    {
+        write(2, "Permission denied\n", 18);
+        free(path);
+        free_argv(envp);
+        exit(126); // Çalıştırma izni yok
+    }
+
+    execve(path, argv, envp);
+
+    // execve başarısızsa
+    perror("execve");
+    free(path);
+    free_argv(envp);
+    exit(1); // Diğer hata
+}
+
 
 int execute_command(char **argv, t_data *data)
 {
-    pid_t   pid;
-    char    *path;
-    char    **envp;
-    int     status;
+    pid_t pid;
+    int status;
+    char **envp = env_to_envp(data->env);
 
-    envp = env_to_envp(data->env);
     if (!envp)
-        return (1); // Bellek hatası gibi genel hata
+        return (1); // Bellek hatası
+
     pid = fork();
     if (pid == 0)
-    {
-        path = get_command_path(argv[0], data); // Komutun tam yolu alınır
-        if (!path)
-        {
-            write(2, "Command not found\n", 18);
-            free_argv(envp);
-            exit(127); // Bash uyumlu hata kodu
-        }
-        execve(path, argv, envp);
-        perror("execve");
-        free(path);
-        free_argv(envp);
-        exit(1); // execve başarısız olursa
-    }
-    else if (pid > 0)
-    {
-        waitpid(pid, &status, 0);
-        free_argv(envp);
-
-        if (WIFEXITED(status))
-            return (WEXITSTATUS(status)); // çocuk başarıyla çıktıysa onun return değeri
-        else if (WIFSIGNALED(status))
-            return (128 + WTERMSIG(status)); // Ctrl+C gibi sinyalle çıkış
-        else
-            return (1); // Diğer durumlar
-    }
-    else
+        run_child_process(argv, envp, data);
+    else if (pid < 0)
     {
         perror("fork");
         free_argv(envp);
-        return (1); // fork başarısızsa
+        return 1;
     }
+    waitpid(pid, &status, 0);
+    free_argv(envp);
+    if (WIFEXITED(status))
+        return WEXITSTATUS(status);
+    if (WIFSIGNALED(status))
+        return 128 + WTERMSIG(status);
+    return 1;
 }
+
 
 

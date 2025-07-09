@@ -13,30 +13,34 @@ int check_unclosed_quotes(const char *str)
     }
     return (flag != 0);
 }
-int	validate_syntax(t_token *tok)
+int	validate_syntax(t_token *tok, t_data *data)
 {
 	if (!tok)
-		return (0);
+		return (1); // Boşsa sorun yok
+	
 	// PIPE ile başlama
 	if (tok->type == T_PIPE)
 	{
 		write(2, "minishell: syntax error near unexpected token `|'\n", 50);
+		data->exit_status = 258;
 		return (0);
 	}
 	while (tok)
 	{
-		// PIPE sonrası bir şey yoksa
+		// PIPE sonrası bir şey yoksa veya bir tane daha PIPE varsa
 		if (tok->type == T_PIPE && (!tok->next || tok->next->type == T_PIPE))
 		{
 			write(2, "minishell: syntax error near unexpected token `|'\n", 50);
+			data->exit_status = 258;
 			return (0);
 		}
-		// REDIRECTION sonrası kelime yoksa
+		// Redirect'ten sonra kelime yoksa
 		if (tok->type >= T_REDIR_IN && tok->type <= T_HEREDOC)
 		{
 			if (!tok->next || tok->next->type != T_WORD)
 			{
 				write(2, "minishell: syntax error near unexpected token `newline'\n", 57);
+				data->exit_status = 258;
 				return (0);
 			}
 		}
@@ -44,3 +48,4 @@ int	validate_syntax(t_token *tok)
 	}
 	return (1);
 }
+

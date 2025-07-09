@@ -14,6 +14,6 @@ int ft_export(char **argv, t_data *data);        // ✅ DÜZELTİLDİ
 int ft_unset(char **argv, t_data *data);         // ✅ DÜZELTİLDİ
 int ft_exit(char **argv, t_data *data);
 int is_valid_key(const char *key);
-void	process_export_arg(char *arg, t_data *data);
+int	process_export_arg(char *arg, t_data *data);
 
 #endif
