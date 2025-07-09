@@ -14,7 +14,7 @@ Hiç argüman yoksa: tüm environment'ı alfabetik sırayla yazdır.
 
 #include "builtin.h"
 
-int	ft_export(char **argv, t_data *data)
+/*int	ft_export(char **argv, t_data *data)
 {
 	int	i = 1;
 
@@ -51,7 +51,7 @@ void	process_export_arg(char *arg, t_data *data)
 	}
 	if (key && value)
 		update_env_var(data, key, value);
-}
+}*/
 
 int is_valid_key(const char *key)
 {
@@ -67,4 +67,45 @@ int is_valid_key(const char *key)
         i++;
     }
     return 1;
+}
+int	ft_export(char **argv, t_data *data)
+{
+	int	i = 1;
+	int	has_error = 0;
+
+	while (argv[i])
+	{
+		if (!process_export_arg(argv[i], data))
+			has_error = 1; // en az bir hata olduysa
+		i++;
+	}
+	return (has_error); // 0 → başarı, 1 → hata
+}
+
+int	process_export_arg(char *arg, t_data *data)
+{
+	char	*equal_sign;
+	char	*key;
+	char	*value;
+
+	equal_sign = ft_strchr(arg, '=');
+	if (equal_sign)
+	{
+		*equal_sign = '\0';
+		key = arg;
+		value = equal_sign + 1;
+	}
+	else
+	{
+		key = arg;
+		value = NULL;
+	}
+	if (!is_valid_key(key))
+	{
+		write(2, "export: not a valid identifier\n", 31);
+		return (0); // hata
+	}
+	if (key && value)
+		update_env_var(data, key, value);
+	return (1); // başarı
 }

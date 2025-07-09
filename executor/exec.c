@@ -5,9 +5,9 @@ int executor_execute(t_cmd *cmds, t_data *data)
     while (cmds)
     {
         if (is_builtin(cmds->argv[0]))
-            exec_builtin(cmds, data);
+            data->exit_status = exec_builtin(cmds, data);
         else
-            execute_command(cmds->argv, data);
+            data->exit_status = execute_command(cmds->argv, data);
         cmds = cmds->next;
     }
     return (0);
@@ -49,34 +49,50 @@ char *get_command_path(char *cmd, t_data *data)
     return (NULL);
 }
 
-void execute_command(char **argv, t_data *data)
+int execute_command(char **argv, t_data *data)
 {
     pid_t   pid;
     char    *path;
     char    **envp;
+    int     status;
 
     envp = env_to_envp(data->env);
     if (!envp)
-        return ;
+        return (1); // Bellek hatası gibi genel hata
     pid = fork();
     if (pid == 0)
     {
-        path = get_command_path(argv[0], data); // burada artık data alıyor
+        path = get_command_path(argv[0], data); // Komutun tam yolu alınır
         if (!path)
         {
             write(2, "Command not found\n", 18);
             free_argv(envp);
-            exit(127);
+            exit(127); // Bash uyumlu hata kodu
         }
         execve(path, argv, envp);
         perror("execve");
         free(path);
         free_argv(envp);
-        exit(1);
+        exit(1); // execve başarısız olursa
     }
     else if (pid > 0)
-        waitpid(pid, NULL, 0);
+    {
+        waitpid(pid, &status, 0);
+        free_argv(envp);
+
+        if (WIFEXITED(status))
+            return (WEXITSTATUS(status)); // çocuk başarıyla çıktıysa onun return değeri
+        else if (WIFSIGNALED(status))
+            return (128 + WTERMSIG(status)); // Ctrl+C gibi sinyalle çıkış
+        else
+            return (1); // Diğer durumlar
+    }
     else
+    {
         perror("fork");
-    free_argv(envp);
+        free_argv(envp);
+        return (1); // fork başarısızsa
+    }
 }
+
+

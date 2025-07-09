@@ -31,8 +31,11 @@ static char	*get_target_path(char **argv, t_data *data)
 			write(2, "cd: OLDPWD not set\n", 20);
 			return (NULL);
 		}
-		write(1, path, strlen(path));
-		write(1, "\n", 1);
+		if (write(1, path, strlen(path)) == -1 || write(1, "\n", 1) == -1)
+		{
+			perror("cd: write error");
+			return (NULL);
+		}
 	}
 	else
 		path = argv[1];
@@ -47,16 +50,14 @@ int	ft_cd(char **argv, t_data *data)
 	oldpwd = get_env_value(data->env, "PWD");
 	path = get_target_path(argv, data);
 	if (!path)
-		return (1);
+		return (1); // Hedef path yoksa, hata
+
 	if (chdir(path) != 0)
 	{
 		perror("cd");
-		return (1);
+		return (1); // chdir başarısız
 	}
+
 	update_pwd_vars(data, oldpwd);
-	return (0);
+	return (0); // Başarılı
 }
-
-
-
-
