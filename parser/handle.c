@@ -13,7 +13,7 @@ int	handle_word(char *input, t_token **tokens, int i)
 	if (i > start)
 	{
 		char *word = ft_strndup(&input[start], i - start); // Kopyala
-		add_token(tokens, word, T_WORD);               // Token ekle
+		add_token(tokens, word, T_WORD, 0);               // Token ekle
 		free(word);
 	}
 	return (i - start); // Kaç karakter ilerledik
@@ -39,7 +39,7 @@ int handle_quote(char *input, t_token **tokens, int i)
     word = ft_strndup(&input[start], i - start);
     if (!word)
         return (0);
-    add_token(tokens, word, T_WORD);
+    add_token(tokens, word, T_WORD, odd_or_double_quote(quote));
     free(word);
     return (i - start + 2); // +1 tırnak, +1 başta artırmıştık
 }
@@ -67,22 +67,22 @@ int handle_redirection(char *input, t_token **tokens, int i)
 
 	if (input[i] == '>' && input[i + 1] == '>')
 	{
-		add_token(tokens, ">>", T_REDIR_APPEND);
+		add_token(tokens, ">>", T_REDIR_APPEND, 0);
 		return (2); // iki karakter ilerle
 	}
 	else if (input[i] == '<' && input[i + 1] == '<')
 	{
-		add_token(tokens, "<<", T_HEREDOC);
+		add_token(tokens, "<<", T_HEREDOC, 0);
 		return (2);
 	}
 	else if (input[i] == '>')
 	{
-		add_token(tokens, ">", T_REDIR_OUT);
+		add_token(tokens, ">", T_REDIR_OUT, 0);
 		return (1);
 	}
 	else if (input[i] == '<')
 	{
-		add_token(tokens, "<", T_REDIR_IN);
+		add_token(tokens, "<", T_REDIR_IN, 0);
 		return (1);
 	}
 	return (0); // geçerli değilse (teorik olarak gerekmez)

@@ -132,8 +132,8 @@ int	main(int argc, char **argv, char **envp)
 		expand_token(data.env, data.tokens, data.exit_status);
 
 		// Token debug
-		printf("=== Token Listesi ===\n");
-		print_tokens(data.tokens);
+		// printf("=== Token Listesi ===\n");
+		// print_tokens(data.tokens);
 
 		// Parser
 		cmds = parse_tokens(data.tokens);

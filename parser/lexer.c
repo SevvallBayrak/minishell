@@ -17,7 +17,7 @@ int dispatch_lexer(char *input, int i, t_token **tokens)
 	}
 	else if (input[i] == '|')
 	{
-    	add_token(tokens, "|", T_PIPE);
+    	add_token(tokens, "|", T_PIPE, 2);
     	step += 1;
 	}
 	else if (is_operator(input[i]))

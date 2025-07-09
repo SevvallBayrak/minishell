@@ -82,4 +82,3 @@ void expand_tokens(t_env *env, t_token *tokens, int exit_status)
 		tokens = tokens->next;
 	}
 }
-

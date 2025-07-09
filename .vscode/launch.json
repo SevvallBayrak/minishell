@@ -6,8 +6,8 @@
       "type": "lldb",
       "request": "launch",
       "args": [],
-      "cwd": "/Users/pelin/Desktop/minishell/srcs",
-      "program": "/Users/pelin/Desktop/minishell/srcs/build/Debug/outDebug"
+      "cwd": "/Users/pelin/Desktop/minik 15.29.00/parser",
+      "program": "/Users/pelin/Desktop/minik 15.29.00/parser/build/Debug/outDebug"
     }
   ]
 }
