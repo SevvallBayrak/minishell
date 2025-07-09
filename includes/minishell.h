@@ -66,6 +66,7 @@ typedef struct s_data {
     t_token     *tokens;       // Token listesi (lexer çıktısı)
     t_cmd       *cmds;         // Komutlar listesi (parser çıktısı)
     t_env       *env;          // Environment değişken listesi
+    int         exit_status;   // ← Global exit kodu yerine kullanılacak
 } t_data;
 
 void	setup_signal_handlers(void);
@@ -93,7 +94,7 @@ void	ensure_pwd_exists(t_data *data);
 void remove_env_var(t_env **env, const char *key);
 char **env_to_envp(t_env *env);
 void free_argv(char **argv);
-void execute_command(char **argv, t_data *data);
+int execute_command(char **argv, t_data *data);
 char *ft_strjoin_path(const char *dir, const char *cmd);
 
 
