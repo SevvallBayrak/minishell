@@ -1,18 +1,11 @@
 #include "minishell.h"
 
-char *expand_exit_status(char *str, int pos)
+char *expand_exit_status(char *str, int pos, int exit_status)
 {
-	char *prefix = ft_substr(str, 0, pos);
-	char *suffix = ft_strdup(&str[pos + 2]);
-	char *status = ft_itoa(g_exit_status);
-	char *result = ft_strjoin(prefix, status);
-	char *final = ft_strjoin(result, suffix);
-	free(prefix);
-	free(suffix);
-	free(status);
-	free(result);
-	return final;
+	char *status = ft_itoa(exit_status);
+	// ...
 }
+
 
 
 char *expand_variable(t_env *env, char *str)
