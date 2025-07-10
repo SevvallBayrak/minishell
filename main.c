@@ -6,8 +6,6 @@
 #include <readline/history.h>
 
 #include <stdlib.h>
-int g_exit_status = 0;
-
 
 void free_argv(char **argv)
 {
@@ -102,8 +100,8 @@ int	main(int argc, char **argv, char **envp)
 	data.tokens = NULL;
 	data.env = NULL; // Env başta boş
 
+	init_signal();
 	init_env(&data, envp); // ✅ ENV LİSTESİNİ BURADA OLUŞTURUYORSUN
-	setup_signal_handlers();
 
 	while (1)
 	{

@@ -17,6 +17,11 @@ int	validate_syntax(t_token *tok, t_data *data)
 {
 	if (!tok)
 		return (1); // Boşsa sorun yok
+	if (tok->type == T_PIPE)
+	{
+		write(2, "minishell: syntax error near unexpected token `|'\n", 50);
+		return (0);
+	}
 	while (tok)
 	{
 		// PIPE sonrası bir şey yoksa veya bir tane daha PIPE varsa

@@ -2,18 +2,35 @@
 #include <signal.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+# include <termios.h>
 
-void	sigint_handler(int sig)
+void	ft_ctrl_c(int sig)
 {
-    (void)sig;
-    write(1, "\n", 1);
-    rl_replace_line("", 0);       // satırı temizle
-    rl_on_new_line();             // yeni satıra geç
-    rl_redisplay();               // prompt'u tekrar yaz
+	(void)sig;
+	write(1, "\n", 1);
+	rl_on_new_line();
+	rl_replace_line("", 0);
+	rl_redisplay();
 }
 
-void	setup_signal_handlers(void)
+void	init_signal(void)
 {
-    signal(SIGINT, sigint_handler);
+	struct termios	term;
+	
+	tcgetattr(STDIN_FILENO, &term);
+	term.c_lflag &= ~ECHOCTL;
+	tcsetattr(STDIN_FILENO, TCSANOW, &term);
+	signal(SIGINT, ft_ctrl_c);
+	signal(SIGQUIT, SIG_IGN);
+}
+void    set_ignore_signals(void)
+{
+    signal(SIGINT, SIG_IGN);
     signal(SIGQUIT, SIG_IGN);
+}
+
+void    set_default_signals(void)
+{
+    signal(SIGINT, SIG_DFL);
+    signal(SIGQUIT, SIG_DFL);
 }

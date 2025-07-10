@@ -59,6 +59,8 @@
   "files.associations": {
     "minishell.h": "c",
     "utils.h": "c",
-    "builtin.h": "c"
+    "builtin.h": "c",
+    "history.h": "c",
+    "signal.h": "c"
   }
 }

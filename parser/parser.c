@@ -102,5 +102,6 @@ t_cmd *parse_tokens(t_token *tokens)
 		        return (NULL);
 		tokens = tokens->next;
 	}
+	//FREE CURRENT YAPMAN GEREKEBİLİR!!!
 	return (cmds);
 }
