@@ -89,6 +89,7 @@ void print_tokens(t_token *tokens)
         tokens = tokens->next;
     }
 }
+
 int	main(int argc, char **argv, char **envp)
 {
 	char	*line;
@@ -129,11 +130,6 @@ int	main(int argc, char **argv, char **envp)
 		}
 		expand_tokens(data.env, data.tokens, data.exit_status);
 
-		// Token debug
-		// printf("=== Token Listesi ===\n");
-		// print_tokens(data.tokens);
-
-		// Parser
 		cmds = parse_tokens(data.tokens);
 		if (!cmds)
 		{
@@ -142,13 +138,8 @@ int	main(int argc, char **argv, char **envp)
 			continue;
 		}
 
-		// Cmd debug
-		printf("=== Komut Listesi ===\n");
-		print_cmd_list(cmds);
-		// Komutu çalıştır
 		executor_execute(cmds, &data);
 
-		// Cleanup
 		free_token_list(data.tokens);
 		// free_cmd_list(cmds); 
 		free(line);

@@ -82,12 +82,14 @@ void run_child_process(char **argv, char **envp, t_data *data)
     int path_result;
     char *path = get_command_path(argv[0], data, &path_result);
 
+//    if (redirect_in(data->cmds) || redirect_out(data->cmds))
+//         exit(1);
     if (!path)
     {
         if (path_result == PATH_NO_PERMISSION)
             write(2, "Permission denied\n", 18);
         else
-            write(2, "Command not found\n", 18);
+            write (2, "Command not found\n", 18);
         free_argv(envp);
         exit(path_result == PATH_NO_PERMISSION ? 126 : 127);
     }
@@ -102,19 +104,17 @@ void run_child_process(char **argv, char **envp, t_data *data)
     exit(126);
 }
 
-
 int execute_command(char **argv, t_data *data)
 {
     pid_t pid;
     int status;
     char **envp = env_to_envp(data->env);
-
     if (!envp)
         return (1);
 
     pid = fork();
     if (pid == 0)
-        run_child_process(argv, envp, data);
+       run_child_process(argv, envp, data);
     else if (pid < 0)
     {
         perror("fork");
@@ -122,7 +122,7 @@ int execute_command(char **argv, t_data *data)
         return 1;
     }
 
-    waitpid(pid, &status, 0);
+    waitpid(pid, &status, 0); 
     free_argv(envp);
 
     if (WIFEXITED(status))
@@ -136,10 +136,27 @@ int executor_execute(t_cmd *cmds, t_data *data)
 {
     while (cmds)
     {
+        int original_stdin = dup(STDIN_FILENO);
+        int original_stdout = dup(STDOUT_FILENO);
+
         if (is_builtin(cmds->argv[0]))
+        {
+            if (redirect_in(cmds) || redirect_out(cmds))
+            {
+                cmds = cmds->next;
+                continue;
+            }
             data->exit_status = exec_builtin(cmds, data);
+        }
         else
             data->exit_status = execute_command(cmds->argv, data);
+
+        //🔁 STDIN/STDOUT'u geri getir
+        dup2(original_stdin, STDIN_FILENO);
+        dup2(original_stdout, STDOUT_FILENO);
+        close(original_stdin);
+        close(original_stdout);
+
         cmds = cmds->next;
     }
     return 0;

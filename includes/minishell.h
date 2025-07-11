@@ -97,6 +97,10 @@ void free_argv(char **argv);
 int execute_command(char **argv, t_data *data);
 char *ft_strjoin_path(const char *dir, const char *cmd);
 void	init_signal(void);
+int	redirect_out(t_cmd *cmd);
+int	redirect_in(t_cmd *cmd);
+
+
 
 
 

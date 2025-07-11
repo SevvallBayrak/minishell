@@ -33,18 +33,14 @@ int ft_echo(char **argv)
         newline = 0;
         i++;
     }
-
     while (argv[i])
     {
-        if (write(1, argv[i], strlen(argv[i])) < 0)
-            return (1); // yazma hatası
-        if (argv[i + 1] && write(1, " ", 1) < 0)
-            return (1); // yazma hatası
-        i++;
+		printf("%s", argv[i]);
+		if (argv[i + 1])
+			printf(" ");
+		i++;
     }
-
-    if (newline && write(1, "\n", 1) < 0)
-        return (1); // yazma hatası
-
+    if (newline)
+        printf("\n"); // yazma hatası
     return (0);
 }
