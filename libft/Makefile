@@ -93,7 +93,7 @@ OBJS_B		=	ft_lstnew_bonus.o\
 				ft_lstmap_bonus.o\
 
 				
-FLAGS		= -Wall -Werror -Wextra
+FLAGS		= -Wall -Werror -Wextra -g
 
 all: $(NAME)
 

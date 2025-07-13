@@ -14,7 +14,6 @@ int print_no_red_next_word_error(t_token *next)
 int	handle_redirection_token(t_cmd *cmd, t_token **tok)
 {
 	t_token *next = (*tok)->next;
-
 	if (!(print_no_red_next_word_error(next)))
         return(0);
 	if ((*tok)->type == T_REDIR_IN)

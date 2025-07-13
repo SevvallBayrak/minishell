@@ -51,7 +51,7 @@ void	env_add_back(t_env **env, t_env *new_node)
 	tmp->next = new_node;
 }
 
-void	init_env(t_data *data, char **envp)
+void	    init_env(t_data *data, char **envp)
 {
 	load_env_from_envp(data, envp);
 	//ensure_pwd_exists(data);

@@ -4,7 +4,7 @@
 
 t_token *create_token(char *value, int type, int quote)
 {
-    t_token *new = malloc(sizeof(t_token));
+    t_token *new = ft_calloc(sizeof(t_token), sizeof(t_token));
     if (!new)
         return (NULL);
     new->value = ft_strdup(value);  // value'nun kopyasını al
@@ -63,5 +63,8 @@ t_cmd	*init_new_cmd(void)
 	if (!cmd)
 		return (NULL);
 	ft_bzero(cmd, sizeof(t_cmd));
+	cmd->infile = NULL;
+	cmd->outfile = NULL;
+	cmd->heredoc_delim = NULL;
 	return (cmd);
 }

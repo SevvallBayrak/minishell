@@ -10,7 +10,8 @@ void	ft_ctrl_c(int sig)
 	write(1, "\n", 1);
 	rl_on_new_line();
 	rl_replace_line("", 0);
-	rl_redisplay();
+	rl_redisplay(); //grepten çıktığında iki kez yazmasını bu sağlıyo
+	
 }
 
 void	init_signal(void)

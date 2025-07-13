@@ -90,6 +90,7 @@ void print_tokens(t_token *tokens)
     }
 }
 
+
 int	main(int argc, char **argv, char **envp)
 {
 	char	*line;
@@ -137,7 +138,7 @@ int	main(int argc, char **argv, char **envp)
 			free(line);
 			continue;
 		}
-
+		data.cmds = cmds;  //aslkfjşkasfjnklasdghnasdlkhgjasfklşghjaskşdfghjadsfkşgjnaesdfşkljgaeorşkjgaeworkşgjarşekgjreklşgwaesrdtfgyuhıjkolşjhgfdsghjklşjhgfdszafghjkl
 		executor_execute(cmds, &data);
 
 		free_token_list(data.tokens);

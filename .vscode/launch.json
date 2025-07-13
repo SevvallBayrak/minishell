@@ -2,12 +2,24 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "(gdb) Launch",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceRoot}/minishell",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${fileDirname}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb"
+    },
+    {
       "name": "C/C++ Runner: Debug Session",
       "type": "lldb",
       "request": "launch",
       "args": [],
-      "cwd": "/Users/pelin/Desktop/minik 15.29.00/parser",
-      "program": "/Users/pelin/Desktop/minik 15.29.00/parser/build/Debug/outDebug"
+      "cwd": "/Users/pelin/Desktop/minikshake",
+      "program": "/Users/pelin/Desktop/minikshake/build/Debug/outDebug"
     }
   ]
 }
