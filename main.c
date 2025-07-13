@@ -5,8 +5,6 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
-#include <stdlib.h>
-
 void free_argv(char **argv)
 {
     int i = 0;
@@ -95,7 +93,6 @@ int	main(int argc, char **argv, char **envp)
 {
 	char	*line;
 	t_data	data;
-	t_cmd	*cmds;
 
 	(void)argc;
 	(void)argv;
@@ -131,18 +128,21 @@ int	main(int argc, char **argv, char **envp)
 		}
 		expand_tokens(data.env, data.tokens, data.exit_status);
 
-		cmds = parse_tokens(data.tokens);
-		if (!cmds)
+		data.cmds = parse_tokens(data.tokens);
+		if (!data.cmds)
 		{
 			free_token_list(data.tokens);
 			free(line);
 			continue;
 		}
-		data.cmds = cmds;  //aslkfjşkasfjnklasdghnasdlkhgjasfklşghjaskşdfghjadsfkşgjnaesdfşkljgaeorşkjgaeworkşgjarşekgjreklşgwaesrdtfgyuhıjkolşjhgfdsghjklşjhgfdszafghjkl
-		executor_execute(cmds, &data);
+		executor_execute(&data, line);
 
 		free_token_list(data.tokens);
-		// free_cmd_list(cmds); 
+		if (data.cmds)
+		{
+    		free_cmd_list(data.cmds);
+    		data.cmds = NULL;
+		}
 		free(line);
 	}
 	return (0);

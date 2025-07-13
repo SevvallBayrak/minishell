@@ -1,3 +1,4 @@
+
 #include "minishell.h"
 
 char	*ft_strndup(const char *s1, int a)

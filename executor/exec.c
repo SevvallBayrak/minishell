@@ -129,31 +129,31 @@ int execute_command(char **argv, t_data *data)
 	return 1;
 }
 
-int executor_execute(t_cmd *cmds, t_data *data)
+int executor_execute(t_data *data, char *line)
 {
 
-	while (cmds)
+	while (data->cmds)
 	{
 		int original_stdin = dup(STDIN_FILENO);
 		int original_stdout = dup(STDOUT_FILENO);
 
-		if (is_builtin(cmds->argv[0]))
+		if (is_builtin(data->cmds->argv[0]))
 		{
-			if (redirect_in(cmds) || redirect_out(cmds))
+			if (redirect_in(data->cmds) || redirect_out(data->cmds))
 			{
-				cmds = cmds->next;
+				data->cmds = data->cmds->next;
 				continue;
 			}
-			data->exit_status = exec_builtin(cmds, data);
+			data->exit_status = exec_builtin(data->cmds, data, line);
 		}
 		else
-			data->exit_status = execute_command(cmds->argv, data);
+			data->exit_status = execute_command(data->cmds->argv, data);
 		//STDIN/STDOUT'u geri getir
 		dup2(original_stdin, STDIN_FILENO);
 		dup2(original_stdout, STDOUT_FILENO);
 		close(original_stdin);
 		close(original_stdout);
-		cmds = cmds->next;
+		data->cmds = data->cmds->next;
 	}
 	return 0;
 }
