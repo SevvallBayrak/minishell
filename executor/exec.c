@@ -40,6 +40,8 @@ static char *search_path_dirs(char *path_env, char *cmd, int *result)
 			return NULL;
 		}
 		free(full_path);
+		if(!path_env[j])
+			break; // Eğer sonuna geldiysek döngüyü kır
 		i = j + 1;
 	}
 	*result = PATH_NOT_FOUND;
@@ -128,33 +130,52 @@ int execute_command(char **argv, t_data *data)
 		return 128 + WTERMSIG(status);
 	return 1;
 }
-
 int executor_execute(t_data *data, char *line)
 {
+    if (!data || !data->cmds) {
+        return 0;
+    }
+    t_cmd *curr = data->cmds;
+    t_cmd *next;
 
-	while (data->cmds)
+
+	while (curr)
 	{
+		if (!curr->argv) 
+		{
+			next = curr->next;
+			free_cmd_list(curr);
+			curr = next;
+			continue;
+		}
 		int original_stdin = dup(STDIN_FILENO);
 		int original_stdout = dup(STDOUT_FILENO);
 
-		if (is_builtin(data->cmds->argv[0]))
+		if (is_builtin(curr->argv[0]))
 		{
-			if (redirect_in(data->cmds) || redirect_out(data->cmds))
+			if (redirect_in(curr) || redirect_out(curr))
 			{
-				data->cmds = data->cmds->next;
+				next = curr->next;
+				free_cmd_list(curr); // veya free tek tek
+				curr = next;
 				continue;
 			}
-			data->exit_status = exec_builtin(data->cmds, data, line);
+			data->exit_status = exec_builtin(curr, data, line);
 		}
 		else
-			data->exit_status = execute_command(data->cmds->argv, data);
-		//STDIN/STDOUT'u geri getir
+			data->exit_status = execute_command(curr->argv, data);
+
+		// Geriye dön
 		dup2(original_stdin, STDIN_FILENO);
 		dup2(original_stdout, STDOUT_FILENO);
 		close(original_stdin);
 		close(original_stdout);
-		data->cmds = data->cmds->next;
+
+		next = curr->next;
+		free_cmd_list(curr); // 🔥 asıl burası leak'i çözer
+		curr = next;
 	}
+	data->cmds = NULL;
 	return 0;
 }
 

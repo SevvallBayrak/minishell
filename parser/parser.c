@@ -71,7 +71,7 @@ char	**append_str_to_array(char **arr, char *new_str)
 	new_arr[len] = ft_strdup(new_str);
 	new_arr[len + 1] = NULL;
 
-	free(arr); // hem pointer hem içerikler temizlenir
+	free_argv(arr); // hem pointer hem içerikler temizlenir
 	return (new_arr);
 }
 

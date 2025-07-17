@@ -135,6 +135,9 @@ int	main(int argc, char **argv, char **envp)
 			free(line);
 			continue;
 		}
+		if (has_pipe(data.cmds))
+			run_pipeline(data.cmds, &data, line);
+		else
 		executor_execute(&data, line);
 
 		free_token_list(data.tokens);
@@ -145,5 +148,6 @@ int	main(int argc, char **argv, char **envp)
 		}
 		free(line);
 	}
+	free_env(data.env);
 	return (0);
 }

@@ -78,7 +78,7 @@ void	load_env_from_envp(t_data *data, char **envp)
 		if (tmp[1])
 	        node->value = ft_strdup(tmp[1]);
         else
-	        node->value = NULL;
+	    {    node->value = NULL;}
 		node->next = NULL;
 		env_add_back(&data->env, node);
 		ft_free_split(tmp);

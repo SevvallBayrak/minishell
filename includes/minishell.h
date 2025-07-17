@@ -101,7 +101,8 @@ void free_cmd_list(t_cmd *cmd);
 void free_env(t_env *env);
 void	free_token_list(t_token *list);
 void exit_cleanup(t_data *data, char *line);
-
+int has_pipe(t_cmd *cmds);
+int run_pipeline(t_cmd *cmds, t_data *data, char *line);
 
 
 
