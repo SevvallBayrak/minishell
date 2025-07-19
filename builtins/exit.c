@@ -39,7 +39,7 @@ void free_env(t_env *env)
     }
 }
 
-void exit_cleanup(t_data *data, char *line)
+void exit_cleanup(t_data *data)
 {
     if (data->tokens)
         free_token_list(data->tokens);
@@ -47,10 +47,10 @@ void exit_cleanup(t_data *data, char *line)
         free_cmd_list(data->cmds);
     if (data->env)
         free_env(data->env);
-    free(line);
+    free(data->raw_input);
 }
 
-int ft_exit(char **argv, t_data *data, char *line)
+int ft_exit(char **argv, t_data *data)
 {
     long code = 0;
 
@@ -63,7 +63,7 @@ int ft_exit(char **argv, t_data *data, char *line)
             ft_putstr_fd("minishell: exit: ", 2);
             ft_putstr_fd(argv[1], 2);
             ft_putstr_fd(": numeric argument required\n", 2);
-            exit_cleanup(data, line);
+            exit_cleanup(data);
             exit(255);
         }
         if (argv[2])
@@ -73,6 +73,6 @@ int ft_exit(char **argv, t_data *data, char *line)
         }
         code = ft_atoi(argv[1]);
     }
-    exit_cleanup(data, line);
+    exit_cleanup(data);
     exit((unsigned char)code);
 }

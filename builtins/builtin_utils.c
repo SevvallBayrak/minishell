@@ -14,7 +14,7 @@ int is_builtin(const char *cmd)
         ft_strncmp(cmd, "exit", 5) == 0
     );
 }
-int exec_builtin(t_cmd *cmd, t_data *data, char *line)
+int exec_builtin(t_cmd *cmd, t_data *data)
 {
     if (!cmd || !cmd->argv || !cmd->argv[0])
         return (1);
@@ -32,6 +32,6 @@ int exec_builtin(t_cmd *cmd, t_data *data, char *line)
     else if (ft_strncmp(cmd->argv[0], "unset", 6) == 0)
         return ft_unset(cmd->argv, data);
     else if (ft_strncmp(cmd->argv[0], "exit", 5) == 0)
-        return ft_exit(cmd->argv, data, line);
+        return ft_exit(cmd->argv, data);
     return (1);
 }

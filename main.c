@@ -91,7 +91,6 @@ void print_tokens(t_token *tokens)
 
 int	main(int argc, char **argv, char **envp)
 {
-	char	*line;
 	t_data	data;
 
 	(void)argc;
@@ -104,26 +103,26 @@ int	main(int argc, char **argv, char **envp)
 
 	while (1)
 	{
-		line = readline("minishell> ");
-		if (!line)
+		data.raw_input = readline("minishell> ");
+		if (!data.raw_input)
 		{
 			printf("exit\n");
 			break;
 		}
-		if (*line)
-			add_history(line);
+		if (*data.raw_input)
+			add_history(data.raw_input);
 
 		// Lexer
-		data.tokens = lexer(line, &data);
+		data.tokens = lexer(data.raw_input, &data);
 		if (!data.tokens)
 		{
-			free(line);
+			free(data.raw_input);
 			continue;
 		}
 		if (!validate_syntax(data.tokens, &data))
 		{
 			free_token_list(data.tokens);
-			free(line);
+			free(data.raw_input);
 			continue;
 		}
 		expand_tokens(data.env, data.tokens, data.exit_status);
@@ -132,13 +131,13 @@ int	main(int argc, char **argv, char **envp)
 		if (!data.cmds)
 		{
 			free_token_list(data.tokens);
-			free(line);
+			free(data.raw_input);
 			continue;
 		}
 		if (has_pipe(data.cmds))
-			run_pipeline(data.cmds, &data, line);
+			run_pipeline(data.cmds, &data);
 		else
-		executor_execute(&data, line);
+		executor_execute(&data);
 
 		free_token_list(data.tokens);
 		if (data.cmds)
@@ -146,7 +145,7 @@ int	main(int argc, char **argv, char **envp)
     		free_cmd_list(data.cmds);
     		data.cmds = NULL;
 		}
-		free(line);
+		free(data.raw_input);
 	}
 	free_env(data.env);
 	return (0);

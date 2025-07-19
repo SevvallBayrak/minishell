@@ -130,7 +130,7 @@ int execute_command(char **argv, t_data *data)
 		return 128 + WTERMSIG(status);
 	return 1;
 }
-int executor_execute(t_data *data, char *line)
+int executor_execute(t_data *data)
 {
     if (!data || !data->cmds) {
         return 0;
@@ -150,6 +150,17 @@ int executor_execute(t_data *data, char *line)
 		}
 		int original_stdin = dup(STDIN_FILENO);
 		int original_stdout = dup(STDOUT_FILENO);
+		if (curr->is_heredoc)
+		{
+			int hd_fd = handle_heredoc(curr, data);
+			if (hd_fd == -1)
+			{
+				data->exit_status = 1;
+				break;
+			}
+			dup2(hd_fd, STDIN_FILENO);
+			close(hd_fd);
+		}
 
 		if (is_builtin(curr->argv[0]))
 		{
@@ -160,7 +171,7 @@ int executor_execute(t_data *data, char *line)
 				curr = next;
 				continue;
 			}
-			data->exit_status = exec_builtin(curr, data, line);
+			data->exit_status = exec_builtin(curr, data);
 		}
 		else
 			data->exit_status = execute_command(curr->argv, data);

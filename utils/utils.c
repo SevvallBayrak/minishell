@@ -24,7 +24,7 @@ int	ft_isspace(char c)
 }
 int	is_special_char(char c)
 {
-	return (isspace(c) || c == '|' || c == '<' || c == '>' || c == '\'' || c == '"');
+	return (isspace(c) || c == '|' || c == '<' || c == '>');
 }
 int is_operator(char c)
 {
