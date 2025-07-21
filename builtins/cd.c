@@ -57,7 +57,11 @@ int	ft_cd(char **argv, t_data *data)
 		perror("cd");
 		return (1); // chdir başarısız
 	}
-
+	if (argv[2])///TO MANY ARGUMAN HATASI!!!!
+	{
+		write(2, "cd: too many arguments\n", 24);
+		return (1); // Çok fazla argüman
+	}
 	update_pwd_vars(data, oldpwd);
 	return (0); // Başarılı
 }

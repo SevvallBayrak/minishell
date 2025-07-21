@@ -14,22 +14,39 @@ t_token *create_token(char *value, int type, int quote)
     return (new);
 }
 
-void add_token(t_token **list, char *value, int type, int quote)
+// add_token fonksiyonu (muhtemelen lexer'a yakın bir yerde bulunur)
+// İlk parametre: t_token **head
+// İkinci parametre: char *value
+// Üçüncü parametre: t_token_type type
+// DÖRDÜNCÜ PARAMETRE EKLENİYOR: int q_type (yani senin quote_type alanın)
+void add_token(t_token **head, char *value, t_token_type type, int q_type) // int q_type eklendi
 {
-    t_token *new = create_token(value, type, quote);
-    t_token *temp;
+    t_token *new_token;
 
-    if (!new)
-        return ;
-    if (*list == NULL)
+    new_token = malloc(sizeof(t_token));
+    if (!new_token)
     {
-        *list = new;
-        return ;
-    } 
-    temp = *list;
-    while (temp->next)
-        temp = temp->next;
-    temp->next = new;
+        // Bellek hatası yönetimi
+        return; 
+    }
+    new_token->value = ft_strdup(value);
+    new_token->type = type;
+    new_token->quote_type = q_type; // <-- Buraya q_type değerini ata!
+    new_token->next = NULL;
+    // Eğer prev alanı varsa onu da başlatmalısın (new_token->prev = NULL; gibi).
+    // Senin t_token yapında prev alanı yok, bu yüzden sadece next'i başlatman yeterli.
+
+    if (!*head)
+    {
+        *head = new_token;
+    }
+    else
+    {
+        t_token *last = *head;
+        while (last->next)
+            last = last->next;
+        last->next = new_token;
+    }
 }
 
 void	free_token_list(t_token *list)

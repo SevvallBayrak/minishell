@@ -79,13 +79,14 @@ char *get_command_path(char *cmd, t_data *data, int *result)
 	return search_path_dirs(path_env, cmd, result);
 }
 
-void run_child_process(char **argv, char **envp, t_data *data)
+void run_child_process(t_cmd *cmd, char **argv, char **envp, t_data *data)
 {
 	int path_result;
 	char *path = get_command_path(argv[0], data, &path_result);
-	
-	if (redirect_in(data->cmds) || redirect_out(data->cmds))
-	    exit(1);
+
+	if (redirect_in(cmd) || redirect_out(cmd))
+		exit(1);
+
 	if (!path)
 	{ 
 		if (path_result == PATH_NO_PERMISSION)
@@ -95,25 +96,25 @@ void run_child_process(char **argv, char **envp, t_data *data)
 		free_argv(envp);
 		exit(path_result == PATH_NO_PERMISSION ? 126 : 127);
 	}
-	// execve başarısız olursa buraya düşecek
 	execve(path, argv, envp);
-	// Eğer execve başarısızsa, büyük ihtimalle izin veya dizin hatası
-	write(2, "Permission denied\n", 18);
+	perror("execve");
 	free(path);
 	free_argv(envp);
 	exit(126);
 }
 
-int execute_command(char **argv, t_data *data)
+
+int execute_command(t_cmd *cmd, char **argv, t_data *data)
 {
 	pid_t pid;
 	int status;
 	char **envp = env_to_envp(data->env);
 	if (!envp)
 		return (1);
+
 	pid = fork();
 	if (pid == 0)
-	   run_child_process(argv, envp, data);
+		run_child_process(cmd, argv, envp, data); // ✅ cmd parametresi eklendi
 	else if (pid < 0)
 	{
 		perror("fork");
@@ -130,6 +131,7 @@ int execute_command(char **argv, t_data *data)
 		return 128 + WTERMSIG(status);
 	return 1;
 }
+
 int executor_execute(t_data *data)
 {
     if (!data || !data->cmds) {
@@ -167,6 +169,7 @@ int executor_execute(t_data *data)
 			if (redirect_in(curr) || redirect_out(curr))
 			{
 				next = curr->next;
+				data->exit_status = 1;
 				free_cmd_list(curr); // veya free tek tek
 				curr = next;
 				continue;
@@ -174,7 +177,7 @@ int executor_execute(t_data *data)
 			data->exit_status = exec_builtin(curr, data);
 		}
 		else
-			data->exit_status = execute_command(curr->argv, data);
+			data->exit_status = execute_command(curr, curr->argv, data);
 
 		// Geriye dön
 		dup2(original_stdin, STDIN_FILENO);

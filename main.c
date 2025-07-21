@@ -97,6 +97,7 @@ int	main(int argc, char **argv, char **envp)
 	(void)argv;
 	data.tokens = NULL;
 	data.env = NULL; // Env başta boş
+	data.exit_status = 0; // Başlangıç exit durumu
 
 	init_signal();
 	init_env(&data, envp); // ✅ ENV LİSTESİNİ BURADA OLUŞTURUYORSUN

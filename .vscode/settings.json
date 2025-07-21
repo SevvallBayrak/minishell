@@ -61,6 +61,7 @@
     "utils.h": "c",
     "builtin.h": "c",
     "history.h": "c",
-    "signal.h": "c"
+    "signal.h": "c",
+    "cstdlib": "c"
   }
 }

@@ -88,5 +88,10 @@ int handle_redirection(char *input, t_token **tokens, int i, t_data *data)
 		add_token(tokens, "<", T_REDIR_IN, 0);
 		return (1);
 	}
+	else if (input[i] == '|')
+	{
+		add_token(tokens, "|", T_PIPE, 0);
+		return (1);
+	}
 	return (0);
 }

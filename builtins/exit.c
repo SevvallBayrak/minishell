@@ -64,7 +64,7 @@ int ft_exit(char **argv, t_data *data)
             ft_putstr_fd(argv[1], 2);
             ft_putstr_fd(": numeric argument required\n", 2);
             exit_cleanup(data);
-            exit(255);
+            exit(2);
         }
         if (argv[2])
         {

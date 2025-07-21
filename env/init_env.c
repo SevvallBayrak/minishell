@@ -51,17 +51,13 @@ void	env_add_back(t_env **env, t_env *new_node)
 	tmp->next = new_node;
 }
 
-void	    init_env(t_data *data, char **envp)
-{
-	load_env_from_envp(data, envp);
-	//ensure_pwd_exists(data);
-}
 
-void	load_env_from_envp(t_data *data, char **envp)
+void	init_env(t_data *data, char **envp)
 {
 	int		i = -1;
 	char	**tmp;
 	t_env	*node;
+	int j;
 
 	while (envp[++i])
 	{
@@ -76,7 +72,24 @@ void	load_env_from_envp(t_data *data, char **envp)
 		}
 		node->key = ft_strdup(tmp[0]);
 		if (tmp[1])
-	        node->value = ft_strdup(tmp[1]);
+	    {    node->value = ft_strdup(tmp[1]);
+			j = 2;
+			  while (tmp[j])
+            {
+                // Önceki değeri serbest bırakarak yeni birleştirilmiş stringi oluştur
+                char *temp_value = ft_strjoin(node->value, "="); // Araya '=' ekle
+                if (!temp_value) { // ft_strjoin hatası
+                    free(node->value); free(node->key); free(node); ft_free_split(tmp); return;
+                }
+                free(node->value); // Eski node->value'yu serbest bırak
+                node->value = ft_strjoin(temp_value, tmp[j]); // Yeni parçayı ekle
+                free(temp_value); // Ara stringi serbest bırak
+                if (!node->value) { // ft_strjoin hatası
+                    free(node->key); free(node); ft_free_split(tmp); return;
+                }
+                j++;
+            }
+		}
         else
 	    {    node->value = NULL;}
 		node->next = NULL;
@@ -84,13 +97,3 @@ void	load_env_from_envp(t_data *data, char **envp)
 		ft_free_split(tmp);
 	}
 }
-/*void	ensure_pwd_exists(t_data *data)
-{
-	char cwd[1024];
-
-	if (!get_env_value(data->env, "PWD"))
-	{
-		if (getcwd(cwd, sizeof(cwd)))
-			update_env_var(data, "PWD", cwd);
-	}
-}*/

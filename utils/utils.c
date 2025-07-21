@@ -22,9 +22,9 @@ int	ft_isspace(char c)
 {
 	return (c == 32 || (c <= 13 && c >= 9));
 }
-int	is_special_char(char c)
+int is_special_char(char c)
 {
-	return (isspace(c) || c == '|' || c == '<' || c == '>');
+    return (isspace(c) || c == '|' || c == '<' || c == '>' || c == '\'' || c == '"');
 }
 int is_operator(char c)
 {

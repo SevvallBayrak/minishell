@@ -93,7 +93,7 @@ void	ensure_pwd_exists(t_data *data);
 void remove_env_var(t_env **env, const char *key);
 char **env_to_envp(t_env *env);
 void free_argv(char **argv);
-int execute_command(char **argv, t_data *data);
+int execute_command(t_cmd *cmd, char **argv, t_data *data);
 char *ft_strjoin_path(const char *dir, const char *cmd);
 void	init_signal(void);
 int	redirect_out(t_cmd *cmd);
@@ -111,11 +111,9 @@ int	handle_heredoc(t_cmd *cmd, t_data *data);
 char *expand_variable(t_env *env, char *str, int exit_status);
 // minishell.h
 int	is_expandable_delimiter(const char *delim);
-
-
-
-
-
+// includes/parser.h
+// Artık t_token_type ve int q_type kullanacağız.
+void add_token(t_token **head, char *value, t_token_type type, int q_type); // <-- Bu şekilde olmalı
 
 
 #endif

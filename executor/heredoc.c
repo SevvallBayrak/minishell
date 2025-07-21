@@ -1,7 +1,10 @@
+
 #include "minishell.h"
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <sys/wait.h>
+
 
 int	is_expandable_delimiter(const char *delim)
 {
