@@ -1,9 +1,5 @@
 #include "builtin.h"
-
 #include "minishell.h"
-#include "builtin.h"
-#include <stdlib.h>
-#include <unistd.h>
 
 static int is_numeric(const char *str)
 {
@@ -64,7 +60,7 @@ int ft_exit(char **argv, t_data *data)
             ft_putstr_fd(argv[1], 2);
             ft_putstr_fd(": numeric argument required\n", 2);
             exit_cleanup(data);
-            exit(2);
+            exit(255);
         }
         if (argv[2])
         {

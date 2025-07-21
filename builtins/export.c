@@ -1,16 +1,3 @@
-/*
-🔧 Fonksiyon Olarak Yapılacaklar
-
-argv'yi dolaş: export sonrası gelen her argümanı kontrol et.
-Eşittir (=) var mı kontrol et.
-= varsa:
-key ve value'yu ayır (split).
-geçerli key mi kontrol et.
-update_env_var(data, key, value) ile güncelle.
-= yoksa:
-key geçerliyse value = NULL olarak ekle.
-Hiç argüman yoksa: tüm environment'ı alfabetik sırayla yazdır.
-*/
 
 #include "builtin.h"
 
