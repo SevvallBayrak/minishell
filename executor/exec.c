@@ -132,64 +132,74 @@ int execute_command(t_cmd *cmd, char **argv, t_data *data)
 	return 1;
 }
 
+static void restore_std_fds(int in, int out)
+{
+	dup2(in, STDIN_FILENO);
+	dup2(out, STDOUT_FILENO);
+	close(in);
+	close(out);
+}
+
+static int prepare_stdin_for_heredoc(t_cmd *cmd, t_data *data)
+{
+	int hd_fd;
+
+	if (!cmd->is_heredoc)
+		return (0);
+	hd_fd = handle_heredoc(cmd, data);
+	if (hd_fd == -1)
+	{
+		data->exit_status = 1;
+		return (1);
+	}
+	dup2(hd_fd, STDIN_FILENO);
+	close(hd_fd);
+	return (0);
+}
+
+static int execute_one_command(t_cmd *cmd, t_data *data)
+{
+	if (!cmd->argv)
+		return (1);
+	if (prepare_stdin_for_heredoc(cmd, data))
+		return (1);
+	if (is_builtin(cmd->argv[0]))
+	{
+		if (redirect_in(cmd) || redirect_out(cmd))
+			return (1);
+		data->exit_status = exec_builtin(cmd, data);
+	}
+	else
+		data->exit_status = execute_command(cmd, cmd->argv, data);
+	return (0);
+}
+
 int executor_execute(t_data *data)
 {
-    if (!data || !data->cmds) {
-        return 0;
-    }
-    t_cmd *curr = data->cmds;
-    t_cmd *next;
+	t_cmd *curr;
+	t_cmd *next;
+	int in, out;
 
-
+	if (!data || !data->cmds)
+		return (0);
+	curr = data->cmds;
 	while (curr)
 	{
-		if (!curr->argv) 
+		in = dup(STDIN_FILENO);
+		out = dup(STDOUT_FILENO);
+		next = curr->next;
+		if (execute_one_command(curr, data))
 		{
-			next = curr->next;
+			restore_std_fds(in, out);
 			free_cmd_list(curr);
 			curr = next;
 			continue;
 		}
-		int original_stdin = dup(STDIN_FILENO);
-		int original_stdout = dup(STDOUT_FILENO);
-		if (curr->is_heredoc)
-		{
-			int hd_fd = handle_heredoc(curr, data);
-			if (hd_fd == -1)
-			{
-				data->exit_status = 1;
-				break;
-			}
-			dup2(hd_fd, STDIN_FILENO);
-			close(hd_fd);
-		}
-
-		if (is_builtin(curr->argv[0]))
-		{
-			if (redirect_in(curr) || redirect_out(curr))
-			{
-				next = curr->next;
-				data->exit_status = 1;
-				free_cmd_list(curr); // veya free tek tek
-				curr = next;
-				continue;
-			}
-			data->exit_status = exec_builtin(curr, data);
-		}
-		else
-			data->exit_status = execute_command(curr, curr->argv, data);
-
-		// Geriye dön
-		dup2(original_stdin, STDIN_FILENO);
-		dup2(original_stdout, STDOUT_FILENO);
-		close(original_stdin);
-		close(original_stdout);
-
-		next = curr->next;
-		free_cmd_list(curr); // 🔥 asıl burası leak'i çözer
+		restore_std_fds(in, out);
+		free_cmd_list(curr);
 		curr = next;
 	}
 	data->cmds = NULL;
-	return 0;
+	return (0);
 }
 

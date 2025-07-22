@@ -2,20 +2,25 @@
 #include "utils.h"
 #include "parser.h"
 
-int print_no_red_next_word_error(t_token *next)
+int	print_no_red_next_word_error(t_token *next)
 {
 	if (!next || next->type != T_WORD)
 	{
-		write(2, "minishell: syntax error near unexpected token `newline'\n", 57);
+		write(2,
+			"minishell: syntax error near unexpected token `newline'\n",
+			57);
 		return (0);
 	}
-    return (1);
+	return (1);
 }
+
 int	handle_redirection_token(t_cmd *cmd, t_token **tok)
 {
-	t_token *next = (*tok)->next;
+	t_token	*next;
+
+	next = (*tok)->next;
 	if (!(print_no_red_next_word_error(next)))
-        return(0);
+		return (0);
 	if ((*tok)->type == T_REDIR_IN)
 		cmd->infile = ft_strdup(next->value);
 	else if ((*tok)->type == T_REDIR_OUT)
@@ -45,41 +50,64 @@ int	handle_pipe_token(t_cmd **current)
 	ft_bzero((*current)->next, sizeof(t_cmd));
 	*current = (*current)->next;
 	return (1);
-} 
+}
 
 char	**append_str_to_array(char **arr, char *new_str)
 {
-	int	len = 0;
-	int	i = -1;
+	int		len;
+	int		i;
 	char	**new_arr;
 
-	// mevcut dizinin uzunluğunu bul
+	len = 0;
+	i = -1;
 	if (arr)
 		while (arr[len])
 			len++;
-
-	// +1 yeni eleman +1 NULL için yer aç
 	new_arr = malloc(sizeof(char *) * (len + 2));
 	if (!new_arr)
 		return (NULL);
-
-	// eskileri kopyala (strdup ile!)
 	while (++i < len)
-	new_arr[i] = ft_strdup(arr[i]);
-
-	// yeniyi ekle
+		new_arr[i] = ft_strdup(arr[i]);
 	new_arr[len] = ft_strdup(new_str);
 	new_arr[len + 1] = NULL;
-
-	free_argv(arr); // hem pointer hem içerikler temizlenir
+	free_argv(arr);
 	return (new_arr);
 }
 
-t_cmd *parse_tokens(t_token *tokens)
+static int	process_token(t_token **tokens, t_cmd **current)
 {
-	t_cmd *cmds = NULL;
-	t_cmd *current = NULL;
+	if ((*tokens)->type == T_WORD)
+	{
+		if (ft_strlen((*tokens)->value) == 0)
+		{
+			*tokens = (*tokens)->next;
+			return (1);
+		}
+		(*current)->argv = append_str_to_array((*current)->argv,
+			(*tokens)->value);
+	}
+	else if ((*tokens)->type == T_PIPE)
+	{
+		if (!handle_pipe_token(current))
+			return (0);
+	}
+	else if ((*tokens)->type >= T_REDIR_IN && (*tokens)->type <= T_HEREDOC)
+	{
+		if (!(handle_redirection_token(*current, tokens)))
+			return (0);
+		return (1);
+	}
+	*tokens = (*tokens)->next;
+	return (1);
+}
 
+t_cmd	*parse_tokens(t_token *tokens)
+{
+	t_cmd	*cmds;
+	t_cmd	*current;
+
+	cmds = NULL;
+	current = NULL;
 	while (tokens)
 	{
 		if (!current)
@@ -89,18 +117,8 @@ t_cmd *parse_tokens(t_token *tokens)
 				return (NULL);
 			cmds = current;
 		}
-		if (tokens->type == T_WORD)
-			current->argv = append_str_to_array(current->argv, tokens->value);
-		else if (tokens->type == T_PIPE)
-		{
-			if (!handle_pipe_token(&current))
-				return (NULL);
-		}
-		else if (tokens->type >= T_REDIR_IN && tokens->type <= T_HEREDOC)
-	        if (!(handle_redirection_token(current, &tokens))) // syntax error olduysa dur
-		        return (NULL);
-		tokens = tokens->next;
+		if (!process_token(&tokens, &current))
+			return (NULL);
 	}
-	//FREE CURRENT YAPMAN GEREKEBİLİR!!!
 	return (cmds);
 }

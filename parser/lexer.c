@@ -1,137 +1,123 @@
 #include "minishell.h"
-#include "utils.h"
 #include "parser.h"
-#include <unistd.h> // write için
 
-// utils.c veya libft'nizde
-char *append_char_to_str(char *s, char c)
+char	*append_char_to_str(char *s, char c)
 {
-    char *new_s;
-    size_t len;
+	char	*new_s;
+	size_t	len;
 
-    if (!s)
-    {
-        new_s = malloc(sizeof(char) * 2); // 1 karakter + null
-        if (!new_s) return (NULL);
-        new_s[0] = c;
-        new_s[1] = '\0';
-        return (new_s);
-    }
-    len = ft_strlen(s);
-    new_s = malloc(sizeof(char) * (len + 2)); // Mevcut + 1 karakter + null
-    if (!new_s) return (NULL);
-    strcpy(new_s, s); // Mevcut içeriği kopyala
-    new_s[len] = c; // Yeni karakteri ekle
-    new_s[len + 1] = '\0';
-    free(s); // Eski stringi serbest bırak
-    return (new_s);
+	if (!s)
+	{
+		new_s = malloc(sizeof(char) * 2);
+		if (!new_s)
+			return (NULL);
+		new_s[0] = c;
+		new_s[1] = '\0';
+		return (new_s);
+	}
+	len = ft_strlen(s);
+	new_s = malloc(sizeof(char) * (len + 2));
+	if (!new_s)
+		return (NULL);
+	strcpy(new_s, s);
+	new_s[len] = c;
+	new_s[len + 1] = '\0';
+	free(s);
+	return (new_s);
 }
 
-// lexer.c
-t_token *lexer(char *input, t_data *data)
+static void	finalize_word_token(t_token **tokens,
+						char **word, int *quote_type)
 {
-    t_token *tokens = NULL;
-    int i = 0;
-    char *current_lex_word = NULL;
-    int start;
-    int current_token_quote_type = 0; // <-- Sadece bu değişkeni kullanacağız (0: NONE, 1: SINGLE, 2: DOUBLE)
+	if (*word)
+	{
+		add_token(tokens, *word, T_WORD, *quote_type);
+		free(*word);
+		*word = NULL;
+	}
+	*quote_type = 0;
+}
 
-    while (input[i])
-    {
-        // Boşluk görürsek
-        if (ft_isspace(input[i]))
-        {
-            if (current_lex_word) // Biriken bir kelime varsa, token olarak ekle
-            {
-                add_token(&tokens, current_lex_word, T_WORD, current_token_quote_type);
-                free(current_lex_word);
-            }
-            current_lex_word = NULL;
-            current_token_quote_type = 0; // Token eklendi, tipi sıfırla
-            i++;
-            continue;
-        }
+static int	handle_quoted_section(char *input, t_data *data,
+			int *i, char **word, int *q_type)
+{
+	char	quote_char;
 
-        // Operatörler veya pipe
-        if (is_operator(input[i]))
-        {
-            if (current_lex_word) // Biriken bir kelime varsa, önce onu ekle
-            {
-                add_token(&tokens, current_lex_word, T_WORD, current_token_quote_type);
-                free(current_lex_word);
-            }
-            current_lex_word = NULL;
-            current_token_quote_type = 0; // Token eklendi, tipi sıfırla
-            int step = handle_redirection(input, &tokens, i, data);
-            if (step == 0)
-            {
-                free_token_list(tokens);
-                if (current_lex_word) free(current_lex_word);
-                return (NULL);
-            }
-            i += step;
-            continue;
-        }
+	quote_char = input[*i];
+	if (*q_type == 0)
+		*q_type = odd_or_double_quote(quote_char);
+	(*i)++;
+	while (input[*i] && input[*i] != quote_char)
+	{
+		*word = append_char_to_str(*word, input[*i]);
+		(*i)++;
+	}
+	if (!input[*i])
+	{
+		write(2,
+			"minishell: syntax error: unclosed quote\n", 40);
+		data->exit_status = 258;
+		return (0);
+	}
+	(*i)++;
+	return (1);
+}
 
-        // Normal kelime karakterleri veya tırnaklı kelimeler
-        start = i; // Kelime toplama segmentinin başlangıcı
-        
-        // Bu iç döngü kelimenin sonuna kadar veya bir durdurucuya kadar devam eder
-        while (input[i] && !ft_isspace(input[i]) && !is_operator(input[i]))
-        {
-            if (input[i] == '\'' || input[i] == '"') // Tırnak başlangıcı
-            {
-                char quote_char = input[i];
-                
-                // Eğer bu, genel token için belirlenen ilk tırnak tipi ise kaydet.
-                // Örneğin: 'abc' için 1. "def" için 2. a'b'c için 0 (varsayılan)
-                // Bu kritik nokta: eğer zaten bir tırnak tipi belirlenmişse (örn. "a" tek tırnakla başladı)
-                // ve sonra yeni bir tırnak türü (örn. 'b' çift tırnakla devam etti) geliyorsa
-                // burada bash'in karmaşık kurallarına girmemiz gerekir.
-                // Ancak basit testler için ilk tırnak türünü genel tür olarak kabul edebiliriz.
-                if (current_token_quote_type == 0) // Henüz bir tırnak tipi belirlenmediyse
-                    current_token_quote_type = odd_or_double_quote(quote_char); // Tırnak tipini ata
+static int	build_and_add_word(char *input, t_token **tokens,
+			t_data *data, int *i)
+{
+	char	*current_word;
+	int	quote_type;
 
-                i++; // Açılış tırnağını atla
-                while (input[i] && input[i] != quote_char)
-                {
-                    current_lex_word = append_char_to_str(current_lex_word, input[i]);
-                    i++;
-                }
-                if (!input[i]) // Kapanış tırnağı yoksa hata
-                {
-                    write(2, "minishell: syntax error: unclosed quote\n", 40);
-                    data->exit_status = 258;
-                    free_token_list(tokens);
-                    if (current_lex_word) free(current_lex_word);
-                    return (NULL);
-                }
-                i++; // Kapanış tırnağını atla
-            }
-            else // Normal kelime karakteri
-            {
-                current_lex_word = append_char_to_str(current_lex_word, input[i]);
-                i++;
-            }
-        }
+	current_word = NULL;
+	quote_type = 0;
+	while (input[*i] && !ft_isspace(input[*i]) && !is_operator(input[*i]))
+	{
+		if (input[*i] == '\'' || input[*i] == '"')
+		{
+			if (!handle_quoted_section(input, data,
+				i, &current_word, &quote_type))
+			{
+				if (current_word)
+					free(current_word);
+				return (0);
+			}
+		}
+		else
+		{
+			current_word = append_char_to_str(current_word,
+				input[*i]);
+			(*i)++;
+		}
+	}
+	finalize_word_token(tokens, &current_word, &quote_type);
+	return (1);
+}
 
-        // Kelime toplama döngüsü bittiğinde
-        if (current_lex_word && i > start)
-        {
-            // Eğer kelimeyi ekliyorsak, belirlenen tırnak tipini kullan.
-            // Eğer hiç tırnak görmediysek current_token_quote_type 0 kalacak.
-            add_token(&tokens, current_lex_word, T_WORD, current_token_quote_type);
-            free(current_lex_word);
-            current_lex_word = NULL;
-            current_token_quote_type = 0; // Token eklendi, tipi sıfırla
-        }
-    }
+t_token	*lexer(char *input, t_data *data)
+{
+	t_token	*tokens;
+	int		i;
+	int		step;
 
-    // Döngü bittikten sonra kalan bir kelime varsa ekle
-    if (current_lex_word)
-    {
-        add_token(&tokens, current_lex_word, T_WORD, current_token_quote_type);
-        free(current_lex_word);
-    }
-    return tokens;
+	tokens = NULL;
+	i = 0;
+	while (input[i])
+	{
+		if (ft_isspace(input[i]))
+			i++;
+		else if (is_operator(input[i]))
+		{
+			step = handle_redirection(input, &tokens, i, data);
+			if (step == 0)
+				return (free_token_list(tokens), NULL);
+			i += step;
+		}
+		else
+		{
+			if (!build_and_add_word(input, &tokens, data, &i))
+				return (free_token_list(tokens), NULL);
+		}
+	}
+	return (tokens);
 }

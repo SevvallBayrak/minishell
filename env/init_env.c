@@ -32,24 +32,24 @@ void	env_add_back(t_env **env, t_env *new_node)
 	tmp->next = new_node;
 }
 
-void freetmp_and_join (t_env *node, char **tmp, int j)
+void	freetmp_and_join(t_env *node, char **tmp, int j)
 {
- 	// Önceki değeri serbest bırakarak yeni birleştirilmiş stringi oluştur
-    char *temp_value;
-	temp_value = ft_strjoin(node->value, "="); // Araya '=' ekle
-    free(node->value); // Eski node->value'yu serbest bırak
-    node->value = ft_strjoin(temp_value, tmp[j]); // Yeni parçayı ekle
-    free(temp_value); // Ara stringi serbest bırak
+	char	*temp_value;
+
+	temp_value = ft_strjoin(node->value, "=");
+	free(node->value);
+	node->value = ft_strjoin(temp_value, tmp[j]);
+	free(temp_value);
 }
 
-void node_value(char **tmp, t_env *node)
+void	node_value(char **tmp, t_env *node)
 {
-	int 	j;
+	int	j;
 
 	node->value = ft_strdup(tmp[1]);
 	j = 2;
 	while (tmp[j])
-    {    
+	{
 		freetmp_and_join(node, tmp, j);
 		j++;
 	}
@@ -60,23 +60,23 @@ void	init_env(t_data *data, char **envp)
 	int		i;
 	char	**tmp;
 	t_env	*node;
-	
+
 	i = -1;
 	while (envp[++i])
 	{
 		tmp = ft_split(envp[i], '=');
 		if (!tmp)
-			continue;
+			continue ;
 		node = malloc(sizeof(t_env));
 		if (!node)
 		{
 			ft_free_split(tmp);
-			continue;
+			continue ;
 		}
 		node->key = ft_strdup(tmp[0]);
 		if (tmp[1])
 			node_value(tmp, node);
-        else
+		else
 			node->value = NULL;
 		node->next = NULL;
 		env_add_back(&data->env, node);

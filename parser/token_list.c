@@ -1,52 +1,42 @@
+
 #include "minishell.h"
-#include "utils.h"
 #include "parser.h"
 
-t_token *create_token(char *value, int type, int quote)
+t_token	*create_token(char *value, int type, int quote)
 {
-    t_token *new = ft_calloc(sizeof(t_token), sizeof(t_token));
-    if (!new)
-        return (NULL);
-    new->value = ft_strdup(value);  // value'nun kopyasını al
-    new->type = type;
+	t_token	*new;
+
+	new = ft_calloc(sizeof(t_token), sizeof(t_token));
+	if (!new)
+		return (NULL);
+	new->value = ft_strdup(value);
+	new->type = type;
 	new->quote_type = quote;
-    new->next = NULL;
-    return (new);
+	new->next = NULL;
+	return (new);
 }
 
-// add_token fonksiyonu (muhtemelen lexer'a yakın bir yerde bulunur)
-// İlk parametre: t_token **head
-// İkinci parametre: char *value
-// Üçüncü parametre: t_token_type type
-// DÖRDÜNCÜ PARAMETRE EKLENİYOR: int q_type (yani senin quote_type alanın)
-void add_token(t_token **head, char *value, t_token_type type, int q_type) // int q_type eklendi
+void	add_token(t_token **head, char *value, t_token_type type, int q_type)
 {
-    t_token *new_token;
+	t_token	*new_token;
+	t_token	*last;
 
-    new_token = malloc(sizeof(t_token));
-    if (!new_token)
-    {
-        // Bellek hatası yönetimi
-        return; 
-    }
-    new_token->value = ft_strdup(value);
-    new_token->type = type;
-    new_token->quote_type = q_type; // <-- Buraya q_type değerini ata!
-    new_token->next = NULL;
-    // Eğer prev alanı varsa onu da başlatmalısın (new_token->prev = NULL; gibi).
-    // Senin t_token yapında prev alanı yok, bu yüzden sadece next'i başlatman yeterli.
-
-    if (!*head)
-    {
-        *head = new_token;
-    }
-    else
-    {
-        t_token *last = *head;
-        while (last->next)
-            last = last->next;
-        last->next = new_token;
-    }
+	new_token = malloc(sizeof(t_token));
+	if (!new_token)
+		return ;
+	new_token->value = ft_strdup(value);
+	new_token->type = type;
+	new_token->quote_type = q_type;
+	new_token->next = NULL;
+	if (!*head)
+		*head = new_token;
+	else
+	{
+		last = *head;
+		while (last->next)
+			last = last->next;
+		last->next = new_token;
+	}
 }
 
 void	free_token_list(t_token *list)
@@ -61,12 +51,14 @@ void	free_token_list(t_token *list)
 		list = temp;
 	}
 }
+
 void	free_str_array(char **arr)
 {
-	int i = 0;
+	int	i;
 
+	i = 0;
 	if (!arr)
-		return;
+		return ;
 	while (arr[i])
 	{
 		free(arr[i]);
@@ -74,9 +66,12 @@ void	free_str_array(char **arr)
 	}
 	free(arr);
 }
+
 t_cmd	*init_new_cmd(void)
 {
-	t_cmd *cmd = malloc(sizeof(t_cmd));
+	t_cmd	*cmd;
+
+	cmd = malloc(sizeof(t_cmd));
 	if (!cmd)
 		return (NULL);
 	ft_bzero(cmd, sizeof(t_cmd));

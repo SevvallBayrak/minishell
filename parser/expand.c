@@ -1,15 +1,19 @@
 #include "minishell.h"
 
-// char *expand_exit_status(char *str, int pos, int exit_status)
-// {
-// 	char *status = ft_itoa(exit_status);
-// 	// ...
-// }
-
-static char *expand_key(t_env *env, char *str, int i, int *j, int exit_status)
+static void	append_and_replace(char **result, char *addition)
 {
-	char *key;
-	char *value;
+	char	*temp;
+
+	temp = ft_strjoin(*result, addition);
+	free(*result);
+	*result = temp;
+}
+
+static char	*expand_key(t_env *env, char *str,
+		int i, int *j, int exit_status)
+{
+	char	*key;
+	char	*value;
 
 	*j = i + 1;
 	if (str[*j] == '?')
@@ -29,46 +33,39 @@ static char *expand_key(t_env *env, char *str, int i, int *j, int exit_status)
 	return (key);
 }
 
-static void	append_and_replace(char **result, char *addition)
+char	*expand_variable(t_env *env, char *str, int exit_status)
 {
-	char *temp = ft_strjoin(*result, addition);
-	free(*result);
-	*result = temp;
-}
-
-char *expand_variable(t_env *env, char *str, int exit_status)
-{
-	int		i = 0;
+	int		i;
 	int		j;
-	char	*result = ft_strdup("");
+	char	*result;
 	char	*prefix;
 	char	*key;
 
+	i = 0;
+	result = ft_strdup("");
 	while (str[i])
 	{
-		if (str[i] == '$' && str[i + 1] &&
-			(ft_isalnum(str[i + 1]) || str[i + 1] == '_' || str[i + 1] == '?'))
+		if (str[i] == '$' && str[i + 1]
+			&& (ft_isalnum(str[i + 1])
+				|| str[i + 1] == '_' || str[i + 1] == '?'))
 		{
-			prefix = ft_substr(str, 0, i); // $'tan önceki kısmı al
+			prefix = ft_substr(str, 0, i);
 			append_and_replace(&result, prefix);
 			free(prefix);
-
-			key = expand_key(env, str, i, &j, exit_status); // $VAR ya da $?
+			key = expand_key(env, str, i, &j, exit_status);
 			append_and_replace(&result, key);
 			free(key);
-
-			str += j; // işlenen kısmı atla
-			i = 0; // yeni str'de sıfırdan başla
+			str += j;
+			i = 0;
 		}
 		else
 			i++;
 	}
-	append_and_replace(&result, str); // kalan kısmı ekle
+	append_and_replace(&result, str);
 	return (result);
 }
 
-
-void expand_tokens(t_env *env, t_token *tokens, int exit_status)
+void	expand_tokens(t_env *env, t_token *tokens, int exit_status)
 {
 	char	*expanded;
 
@@ -78,7 +75,8 @@ void expand_tokens(t_env *env, t_token *tokens, int exit_status)
 		{
 			if (ft_strchr(tokens->value, '$'))
 			{
-				expanded = expand_variable(env, tokens->value, exit_status);
+				expanded = expand_variable(env,
+						tokens->value, exit_status);
 				free(tokens->value);
 				tokens->value = expanded;
 			}
