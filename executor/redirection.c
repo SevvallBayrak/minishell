@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-int	redirect_in(t_cmd *cmd)
+int	redirect_in(t_cmd *cmd, t_data *data)
 {
 	int	fd;
 
@@ -9,11 +9,13 @@ int	redirect_in(t_cmd *cmd)
 	fd = open(cmd->infile, O_RDONLY);
 	if (fd < 0)
 	{
+		data->exit_status = 1;
 		perror(cmd->infile);
 		return (1); // hata
 	}
 	if (dup2(fd, STDIN_FILENO) == -1)
 	{    
+		data->exit_status = 1;
         perror("dup2");
         close(fd);
         return (1);
@@ -21,7 +23,7 @@ int	redirect_in(t_cmd *cmd)
 	close(fd);
 	return (0);
 }
-int	redirect_out(t_cmd *cmd)
+int	redirect_out(t_cmd *cmd, t_data *data)
 {
 	int	fd;
 
@@ -38,6 +40,7 @@ int	redirect_out(t_cmd *cmd)
 	}
 	if (dup2(fd, STDOUT_FILENO) == -1)
     {    
+		data->exit_status = 1;
         perror("dup2");
         close(fd);
         return (1);

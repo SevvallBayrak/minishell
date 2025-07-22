@@ -44,7 +44,6 @@ int	handle_heredoc(t_cmd *cmd, t_data *data)
 				break;
             while (data->tokens->next)
             {
-                printf("%d" ,data->tokens->quote_type);
                 tmp = data->tokens->next;
                 data->tokens = tmp;
             }            

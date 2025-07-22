@@ -84,7 +84,7 @@ void run_child_process(t_cmd *cmd, char **argv, char **envp, t_data *data)
 	int path_result;
 	char *path = get_command_path(argv[0], data, &path_result);
 
-	if (redirect_in(cmd) || redirect_out(cmd))
+	if (redirect_in(cmd, data) || redirect_out(cmd, data))
 		exit(1);
 
 	if (!path)
@@ -165,7 +165,7 @@ static int execute_one_command(t_cmd *cmd, t_data *data)
 		return (1);
 	if (is_builtin(cmd->argv[0]))
 	{
-		if (redirect_in(cmd) || redirect_out(cmd))
+		if (redirect_in(cmd, data) || redirect_out(cmd, data))
 			return (1);
 		data->exit_status = exec_builtin(cmd, data);
 	}

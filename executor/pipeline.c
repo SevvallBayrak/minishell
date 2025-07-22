@@ -42,7 +42,7 @@ void pipe_child_exec(t_cmd *cmd, int in_fd, int out_fd, t_data *data)
 		}
 		close(hd_fd);
 	}
-	if (redirect_in(cmd) || redirect_out(cmd))
+	if (redirect_in(cmd, data) || redirect_out(cmd, data))
 		exit(1);
 
 	if (is_builtin(cmd->argv[0]))
