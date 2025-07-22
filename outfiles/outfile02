@@ -1,0 +1,16 @@
+Makefile
+builtins
+cat
+env
+executor
+includes
+libft
+ls
+main.c
+main.o
+minishell
+minishell_tester
+outfiles
+parser
+signal
+utils

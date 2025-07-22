@@ -100,6 +100,38 @@ static int	handle_word_token(t_token *tok, t_cmd *current)
 	return (1);
 }
 
+static void	open_and_close_outfile(t_cmd *cmd)
+{
+	int	fd;
+
+	if (!cmd->outfile)
+		return ;
+	if (cmd->append)
+		fd = open(cmd->outfile, O_WRONLY | O_CREAT | O_APPEND, 0644);
+	else
+		fd = open(cmd->outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (fd >= 0)
+		close(fd);
+}
+
+static int	handle_token(t_token **tok, t_cmd **curr)
+{
+	t_token	*t = *tok;
+
+	if (t->type == T_WORD)
+		handle_word_token(t, *curr);
+	else if (t->type == T_PIPE)
+		return (handle_pipe_token(curr));
+	else if (t->type >= T_REDIR_IN && t->type <= T_HEREDOC)
+	{
+		open_and_close_outfile(*curr);
+		if (!handle_redirection_token(*curr, tok))
+			return (0);
+		return (1);
+	}
+	return (1);
+}
+
 t_cmd	*parse_tokens(t_token *tokens)
 {
 	t_cmd	*cmds;
@@ -111,19 +143,12 @@ t_cmd	*parse_tokens(t_token *tokens)
 	{
 		if (!init_if_needed(&cmds, &current))
 			return (NULL);
-		if (tokens->type == T_WORD)
-			handle_word_token(tokens, current);
-		else if (tokens->type == T_PIPE)
-		{
-			if (!handle_pipe_token(&current))
-				return (NULL);
-		}
-		else if (tokens->type >= T_REDIR_IN && tokens->type <= T_HEREDOC)
-		{
-			if (!handle_redirection_token(current, &tokens))
-				return (NULL);
-		}
-		tokens = tokens->next;
+		if (!handle_token(&tokens, &current))
+			return (NULL);
+		else if (tokens && tokens->type < T_REDIR_IN)
+			tokens = tokens->next;
 	}
 	return (cmds);
 }
+
+
