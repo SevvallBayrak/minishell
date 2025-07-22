@@ -100,7 +100,7 @@ void data_node_null_and_init_sigenv(int argc, char **argv, char **envp, t_data *
 	init_env(data, envp);
 }
 
-int readline_lexer(t_data *data)
+static int readline_lexer(t_data *data)
 {
 		data->raw_input = readline("minishell> ");
 		if (!data->raw_input)
@@ -125,7 +125,7 @@ int readline_lexer(t_data *data)
 		expand_tokens(data->env, data->tokens, data->exit_status);
 		return (2);
 }
-int parser_exec(t_data *data)
+static int parser_exec(t_data *data)
 {
 	data->cmds = parse_tokens(data->tokens);
 		if (!data->cmds)

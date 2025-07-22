@@ -9,14 +9,30 @@ typedef enum e_path_result
 	PATH_OK = 0,
 	PATH_NOT_FOUND = 127,
 	PATH_NO_PERMISSION = 126
-}   t_path_result;
+}	t_path_result;
 
-static char *search_path_dirs(char *path_env, char *cmd, int *result)
+static int	update_result(char *path, int *result)
 {
-	int i = 0, j;
-	char *dir;
-	char *full_path;
+	if (access(path, F_OK) == 0)
+	{
+		if (access(path, X_OK) == 0)
+		{
+			*result = PATH_OK;
+			return (1);
+		}
+		*result = PATH_NO_PERMISSION;
+	}
+	return (0);
+}
 
+static char	*search_path_dirs(char *path_env, char *cmd, int *result)
+{
+	int		i;
+	int		j;
+	char	*dir;
+	char	*full_path;
+
+	i = 0;
 	while (path_env[i])
 	{
 		while (path_env[i] == ':')
@@ -27,75 +43,66 @@ static char *search_path_dirs(char *path_env, char *cmd, int *result)
 		dir = ft_substr(path_env, i, j - i);
 		full_path = ft_strjoin_path(dir, cmd);
 		free(dir);
-
-		if (access(full_path, F_OK) == 0)
-		{
-			if (access(full_path, X_OK) == 0)
-			{
-				*result = PATH_OK;
-				return full_path;
-			}
-			*result = PATH_NO_PERMISSION;
-			free(full_path);
-			return NULL;
-		}
+		if (update_result(full_path, result))
+			return (full_path);
 		free(full_path);
-		if(!path_env[j])
-			break; // Eğer sonuna geldiysek döngüyü kır
+		if (!path_env[j])
+			break ;
 		i = j + 1;
 	}
 	*result = PATH_NOT_FOUND;
-	return NULL;
+	return (NULL);
 }
 
-char *get_command_path(char *cmd, t_data *data, int *result)
+static char	*handle_absolute_cmd(char *cmd, int *result)
 {
-	char *path_env;
+	if (access(cmd, F_OK) == 0)
+	{
+		if (access(cmd, X_OK) == 0)
+		{
+			*result = PATH_OK;
+			return (ft_strdup(cmd));
+		}
+		*result = PATH_NO_PERMISSION;
+	}
+	return (NULL);
+}
+
+char	*get_command_path(char *cmd, t_data *data, int *result)
+{
+	char	*path_env;
 
 	*result = PATH_NOT_FOUND;
-
 	if (!cmd)
-		return NULL;
-
+		return (NULL);
 	if (cmd[0] == '/' || (cmd[0] == '.' && cmd[1] == '/'))
-	{
-		if (access(cmd, F_OK) == 0)
-		{
-			if (access(cmd, X_OK) == 0)
-			{
-				*result = PATH_OK;
-				return ft_strdup(cmd);
-			}
-			*result = PATH_NO_PERMISSION;
-			return NULL;
-		}
-		return NULL;
-	}
-
+		return (handle_absolute_cmd(cmd, result));
 	path_env = get_env_value(data->env, "PATH");
 	if (!path_env)
-		return NULL;
-
-	return search_path_dirs(path_env, cmd, result);
+		return (NULL);
+	return (search_path_dirs(path_env, cmd, result));
 }
 
-void run_child_process(t_cmd *cmd, char **argv, char **envp, t_data *data)
+static void	handle_exec_error(int result, char **envp)
 {
-	int path_result;
-	char *path = get_command_path(argv[0], data, &path_result);
+	if (result == PATH_NO_PERMISSION)
+		write(2, "Permission denied\n", 18);
+	else
+		write(2, "Command not found\n", 18);
+	free_argv(envp);
+	exit(result);
+}
 
+void	run_child_process(t_cmd *cmd, char **argv, char **envp, t_data *data)
+{
+	int		path_result;
+	char	*path;
+
+	path = get_command_path(argv[0], data, &path_result);
 	if (redirect_in(cmd, data) || redirect_out(cmd, data))
 		exit(1);
-
 	if (!path)
-	{ 
-		if (path_result == PATH_NO_PERMISSION)
-			write(2, "Permission denied\n", 18);
-		else
-			write (2, "Command not found\n", 18);
-		free_argv(envp);
-		exit(path_result == PATH_NO_PERMISSION ? 126 : 127);
-	}
+		handle_exec_error(path_result, envp);
 	execve(path, argv, envp);
 	perror("execve");
 	free(path);
@@ -103,36 +110,34 @@ void run_child_process(t_cmd *cmd, char **argv, char **envp, t_data *data)
 	exit(126);
 }
 
-
-int execute_command(t_cmd *cmd, char **argv, t_data *data)
+int	execute_command(t_cmd *cmd, char **argv, t_data *data)
 {
-	pid_t pid;
-	int status;
-	char **envp = env_to_envp(data->env);
+	pid_t	pid;
+	int		status;
+	char	**envp;
+
+	envp = env_to_envp(data->env);
 	if (!envp)
 		return (1);
-
 	pid = fork();
 	if (pid == 0)
-		run_child_process(cmd, argv, envp, data); // ✅ cmd parametresi eklendi
+		run_child_process(cmd, argv, envp, data);
 	else if (pid < 0)
 	{
 		perror("fork");
 		free_argv(envp);
-		return 1;
+		return (1);
 	}
-
-	waitpid(pid, &status, 0); 
+	waitpid(pid, &status, 0);
 	free_argv(envp);
-
 	if (WIFEXITED(status))
-		return WEXITSTATUS(status);
+		return (WEXITSTATUS(status));
 	if (WIFSIGNALED(status))
-		return 128 + WTERMSIG(status);
-	return 1;
+		return (128 + WTERMSIG(status));
+	return (1);
 }
 
-static void restore_std_fds(int in, int out)
+static void	restore_std_fds(int in, int out)
 {
 	dup2(in, STDIN_FILENO);
 	dup2(out, STDOUT_FILENO);
@@ -140,9 +145,9 @@ static void restore_std_fds(int in, int out)
 	close(out);
 }
 
-static int prepare_stdin_for_heredoc(t_cmd *cmd, t_data *data)
+static int	prepare_stdin_for_heredoc(t_cmd *cmd, t_data *data)
 {
-	int hd_fd;
+	int	hd_fd;
 
 	if (!cmd->is_heredoc)
 		return (0);
@@ -157,7 +162,7 @@ static int prepare_stdin_for_heredoc(t_cmd *cmd, t_data *data)
 	return (0);
 }
 
-static int execute_one_command(t_cmd *cmd, t_data *data)
+static int	execute_one_command(t_cmd *cmd, t_data *data)
 {
 	if (!cmd->argv)
 		return (1);
@@ -173,33 +178,36 @@ static int execute_one_command(t_cmd *cmd, t_data *data)
 		data->exit_status = execute_command(cmd, cmd->argv, data);
 	return (0);
 }
-
-int executor_execute(t_data *data)
+static void	exec_and_restore(t_cmd *curr, t_data *data)
 {
-	t_cmd *curr;
-	t_cmd *next;
-	int in, out;
+	int	in;
+	int	out;
+
+	in = dup(STDIN_FILENO);
+	out = dup(STDOUT_FILENO);
+	if (execute_one_command(curr, data))
+	{
+		restore_std_fds(in, out);
+		return ;
+	}
+	restore_std_fds(in, out);
+}
+
+int	executor_execute(t_data *data)
+{
+	t_cmd	*curr;
+	t_cmd	*next;
 
 	if (!data || !data->cmds)
 		return (0);
 	curr = data->cmds;
 	while (curr)
 	{
-		in = dup(STDIN_FILENO);
-		out = dup(STDOUT_FILENO);
 		next = curr->next;
-		if (execute_one_command(curr, data))
-		{
-			restore_std_fds(in, out);
-			free_cmd_list(curr);
-			curr = next;
-			continue;
-		}
-		restore_std_fds(in, out);
+		exec_and_restore(curr, data);
 		free_cmd_list(curr);
 		curr = next;
 	}
 	data->cmds = NULL;
 	return (0);
 }
-

@@ -19,15 +19,16 @@ char	*append_char_to_str(char *s, char c)
 	new_s = malloc(sizeof(char) * (len + 2));
 	if (!new_s)
 		return (NULL);
-	strcpy(new_s, s);
+	ft_strlcpy(new_s, s, len + 1);
 	new_s[len] = c;
 	new_s[len + 1] = '\0';
 	free(s);
 	return (new_s);
 }
 
+
 static void	finalize_word_token(t_token **tokens,
-						char **word, int *quote_type)
+		char **word, int *quote_type)
 {
 	if (*word)
 	{
@@ -38,8 +39,15 @@ static void	finalize_word_token(t_token **tokens,
 	*quote_type = 0;
 }
 
+static int	print_unclosed_quote(t_data *data)
+{
+	write(2, "minishell: syntax error: unclosed quote\n", 40);
+	data->exit_status = 258;
+	return (0);
+}
+
 static int	handle_quoted_section(char *input, t_data *data,
-			int *i, char **word, int *q_type)
+		int *i, char **word, int *q_type)
 {
 	char	quote_char;
 
@@ -53,44 +61,41 @@ static int	handle_quoted_section(char *input, t_data *data,
 		(*i)++;
 	}
 	if (!input[*i])
-	{
-		write(2,
-			"minishell: syntax error: unclosed quote\n", 40);
-		data->exit_status = 258;
-		return (0);
-	}
+		return (print_unclosed_quote(data));
 	(*i)++;
 	return (1);
 }
 
-static int	build_and_add_word(char *input, t_token **tokens,
-			t_data *data, int *i)
+static int	append_word_char(char *input, char **word, int *i)
 {
-	char	*current_word;
-	int	quote_type;
+	*word = append_char_to_str(*word, input[*i]);
+	(*i)++;
+	return (*word != NULL);
+}
 
-	current_word = NULL;
+static int	build_and_add_word(char *input, t_token **tokens,
+		t_data *data, int *i)
+{
+	char	*word;
+	int		quote_type;
+
+	word = NULL;
 	quote_type = 0;
 	while (input[*i] && !ft_isspace(input[*i]) && !is_operator(input[*i]))
 	{
 		if (input[*i] == '\'' || input[*i] == '"')
 		{
-			if (!handle_quoted_section(input, data,
-				i, &current_word, &quote_type))
+			if (!handle_quoted_section(input, data, i, &word, &quote_type))
 			{
-				if (current_word)
-					free(current_word);
+				if (word)
+					free(word);
 				return (0);
 			}
 		}
-		else
-		{
-			current_word = append_char_to_str(current_word,
-				input[*i]);
-			(*i)++;
-		}
+		else if (!append_word_char(input, &word, i))
+			return (0);
 	}
-	finalize_word_token(tokens, &current_word, &quote_type);
+	finalize_word_token(tokens, &word, &quote_type);
 	return (1);
 }
 
