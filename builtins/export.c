@@ -55,19 +55,40 @@ int is_valid_key(const char *key)
     }
     return 1;
 }
+void print_export_list(t_env *env)
+{
+	t_env *current = env;
+
+	while (current)
+	{
+		printf("declare -x %s", current->key);
+		if (current->value)
+			printf("=\"%s\"", current->value);
+		printf("\n");
+		current = current->next;
+	}
+}
+
 int	ft_export(char **argv, t_data *data)
 {
 	int	i = 1;
 	int	has_error = 0;
 
+	if (!argv[1]) // export tek başına yazılmışsa
+	{
+		print_export_list(data->env); // ya da data->env_list, hangisini kullandıysan
+		return (0);
+	}
+
 	while (argv[i])
 	{
 		if (!process_export_arg(argv[i], data))
-			has_error = 1; // en az bir hata olduysa
+			has_error = 1;
 		i++;
 	}
-	return (has_error); // 0 → başarı, 1 → hata
+	return (has_error);
 }
+
 
 int	process_export_arg(char *arg, t_data *data)
 {
