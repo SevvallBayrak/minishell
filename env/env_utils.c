@@ -72,8 +72,6 @@ static int count_env_vars(t_env *env)
     return (count);
 }
 
-#include "libft.h"
-
 static char *join_env_entry(const char *key, const char *value)
 {
     char    *res;

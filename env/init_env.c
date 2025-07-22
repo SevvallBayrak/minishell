@@ -1,22 +1,3 @@
-// #include "../includes/minishell.h"
-
-// void init_env(t_data *data, char **env)
-// {
-// 	char **tmp;
-// 	int i;
-
-// 	i = -1;
-// 	while(env[++i])
-// 	{
-// 		tmp = ft_split(env[i], '=');
-// 		ft_lstaddback_env(ft_lstnew_env(tmp[1], tmp[2]));
-// 	}
-// }
-// int main(int argc, char **argv, char **env)
-// {
-	
-// }
-
 #include "minishell.h"
 
 void	ft_free_split(char **split)
@@ -51,14 +32,36 @@ void	env_add_back(t_env **env, t_env *new_node)
 	tmp->next = new_node;
 }
 
+void freetmp_and_join (t_env *node, char **tmp, int j)
+{
+ 	// Önceki değeri serbest bırakarak yeni birleştirilmiş stringi oluştur
+    char *temp_value;
+	temp_value = ft_strjoin(node->value, "="); // Araya '=' ekle
+    free(node->value); // Eski node->value'yu serbest bırak
+    node->value = ft_strjoin(temp_value, tmp[j]); // Yeni parçayı ekle
+    free(temp_value); // Ara stringi serbest bırak
+}
+
+void node_value(char **tmp, t_env *node)
+{
+	int 	j;
+
+	node->value = ft_strdup(tmp[1]);
+	j = 2;
+	while (tmp[j])
+    {    
+		freetmp_and_join(node, tmp, j);
+		j++;
+	}
+}
 
 void	init_env(t_data *data, char **envp)
 {
-	int		i = -1;
+	int		i;
 	char	**tmp;
 	t_env	*node;
-	int j;
-
+	
+	i = -1;
 	while (envp[++i])
 	{
 		tmp = ft_split(envp[i], '=');
@@ -72,26 +75,9 @@ void	init_env(t_data *data, char **envp)
 		}
 		node->key = ft_strdup(tmp[0]);
 		if (tmp[1])
-	    {    node->value = ft_strdup(tmp[1]);
-			j = 2;
-			  while (tmp[j])
-            {
-                // Önceki değeri serbest bırakarak yeni birleştirilmiş stringi oluştur
-                char *temp_value = ft_strjoin(node->value, "="); // Araya '=' ekle
-                if (!temp_value) { // ft_strjoin hatası
-                    free(node->value); free(node->key); free(node); ft_free_split(tmp); return;
-                }
-                free(node->value); // Eski node->value'yu serbest bırak
-                node->value = ft_strjoin(temp_value, tmp[j]); // Yeni parçayı ekle
-                free(temp_value); // Ara stringi serbest bırak
-                if (!node->value) { // ft_strjoin hatası
-                    free(node->key); free(node); ft_free_split(tmp); return;
-                }
-                j++;
-            }
-		}
+			node_value(tmp, node);
         else
-	    {    node->value = NULL;}
+			node->value = NULL;
 		node->next = NULL;
 		env_add_back(&data->env, node);
 		ft_free_split(tmp);
