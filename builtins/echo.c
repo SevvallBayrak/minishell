@@ -1,23 +1,27 @@
 #include "builtin.h"
+#include "minishell.h"
+#include <unistd.h>
 
-int ft_echo(char **argv)
+int	ft_echo(char **argv)
 {
-    int i = 1;
-    int newline = 1;
+	int	i;
+	int	newline;
 
-    if (argv[i] && ft_strncmp(argv[i], "-n", 3) == 0)
-    {
-        newline = 0;
-        i++;
-    }
-    while (argv[i])
-    {
-		printf("%s", argv[i]);
-		if (argv[i + 1])
-			printf(" ");
+	i = 1;
+	newline = 1;
+	if (argv[i] && ft_strncmp(argv[i], "-n", 3) == 0)
+	{
+		newline = 0;
 		i++;
-    }
-    if (newline)
-        printf("\n");
-    return (0);
+	}
+	while (argv[i])
+	{
+		write(STDOUT_FILENO, argv[i], ft_strlen(argv[i]));
+		if (argv[i + 1])
+			write(STDOUT_FILENO, " ", 1);
+		i++;
+	}
+	if (newline)
+		write(STDOUT_FILENO, "\n", 1);
+	return (0);
 }
