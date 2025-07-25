@@ -1,12 +1,28 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   env_utils.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/25 06:58:10 by sbayrak           #+#    #+#             */
+/*   Updated: 2025/07/25 08:13:32 by sbayrak          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-char	*get_env_value(t_env *env, const char *key)
+char	*get_env_value(t_env *env_list, const char *key)
 {
-	while (env)
+	while (env_list)
 	{
-		if (strcmp(env->key, key) == 0)
-			return (env->value);
-		env = env->next;
+		if (strcmp(env_list->key, key) == 0)
+		{
+			if (env_list->value)
+				return (ft_strdup(env_list->value));
+			return (NULL);
+		}
+		env_list = env_list->next;
 	}
 	return (NULL);
 }
@@ -34,31 +50,6 @@ void	update_env_var(t_data *data, const char *key, const char *value)
 	new_node->value = ft_strdup(value);
 	new_node->next = NULL;
 	env_add_back(&data->env, new_node);
-}
-
-void	remove_env_var(t_env **env, const char *key)
-{
-	t_env	*curr;
-	t_env	*prev;
-
-	curr = *env;
-	prev = NULL;
-	while (curr)
-	{
-		if (strcmp(curr->key, key) == 0)
-		{
-			if (prev)
-				prev->next = curr->next;
-			else
-				*env = curr->next;
-			free(curr->key);
-			free(curr->value);
-			free(curr);
-			return ;
-		}
-		prev = curr;
-		curr = curr->next;
-	}
 }
 
 static int	count_env_vars(t_env *env)

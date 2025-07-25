@@ -1,4 +1,16 @@
-#include "builtin.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   builtin_utils.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/25 05:02:54 by sbayrak           #+#    #+#             */
+/*   Updated: 2025/07/25 06:57:28 by sbayrak          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "minishell.h"
 
 int	is_builtin(const char *cmd)
 {
@@ -20,6 +32,7 @@ int	is_builtin(const char *cmd)
 		return (1);
 	return (0);
 }
+
 int	exec_builtin(t_cmd *cmd, t_data *data)
 {
 	if (!cmd || !cmd->argv || !cmd->argv[0])

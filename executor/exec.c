@@ -1,97 +1,16 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/25 05:22:07 by sbayrak           #+#    #+#             */
+/*   Updated: 2025/07/25 08:15:12 by sbayrak          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
-#include <unistd.h>
-#include <stdlib.h>
-#include <sys/wait.h>
-#include <stdio.h>
-
-typedef enum e_path_result
-{
-	PATH_OK = 0,
-	PATH_NOT_FOUND = 127,
-	PATH_NO_PERMISSION = 126
-}	t_path_result;
-
-static int	update_result(char *path, int *result)
-{
-	if (access(path, F_OK) == 0)
-	{
-		if (access(path, X_OK) == 0)
-		{
-			*result = PATH_OK;
-			return (1);
-		}
-		*result = PATH_NO_PERMISSION;
-	}
-	return (0);
-}
-
-static char	*search_path_dirs(char *path_env, char *cmd, int *result)
-{
-	int		i;
-	int		j;
-	char	*dir;
-	char	*full_path;
-
-	i = 0;
-	while (path_env[i])
-	{
-		while (path_env[i] == ':')
-			i++;
-		j = i;
-		while (path_env[j] && path_env[j] != ':')
-			j++;
-		dir = ft_substr(path_env, i, j - i);
-		full_path = ft_strjoin_path(dir, cmd);
-		free(dir);
-		if (update_result(full_path, result))
-			return (full_path);
-		free(full_path);
-		if (!path_env[j])
-			break ;
-		i = j + 1;
-	}
-	*result = PATH_NOT_FOUND;
-	return (NULL);
-}
-
-static char	*handle_absolute_cmd(char *cmd, int *result)
-{
-	if (access(cmd, F_OK) == 0)
-	{
-		if (access(cmd, X_OK) == 0)
-		{
-			*result = PATH_OK;
-			return (ft_strdup(cmd));
-		}
-		*result = PATH_NO_PERMISSION;
-	}
-	return (NULL);
-}
-
-char	*get_command_path(char *cmd, t_data *data, int *result)
-{
-	char	*path_env;
-
-	*result = PATH_NOT_FOUND;
-	if (!cmd)
-		return (NULL);
-	if (cmd[0] == '/' || (cmd[0] == '.' && cmd[1] == '/'))
-		return (handle_absolute_cmd(cmd, result));
-	path_env = get_env_value(data->env, "PATH");
-	if (!path_env)
-		return (NULL);
-	return (search_path_dirs(path_env, cmd, result));
-}
-
-static void	handle_exec_error(int result, char **envp)
-{
-	if (result == PATH_NO_PERMISSION)
-		write(2, "Permission denied\n", 18);
-	else
-		write(2, "Command not found\n", 18);
-	free_argv(envp);
-	exit(result);
-}
 
 void	run_child_process(t_cmd *cmd, char **argv, char **envp, t_data *data)
 {
@@ -100,13 +19,21 @@ void	run_child_process(t_cmd *cmd, char **argv, char **envp, t_data *data)
 
 	path = get_command_path(argv[0], data, &path_result);
 	if (redirect_in(cmd, data) || redirect_out(cmd, data))
+	{
+		free_argv(envp);
+		free(path);
 		exit(1);
+	}
 	if (!path)
+	{
+		exit_cleanup(data);
 		handle_exec_error(path_result, envp);
+	}
 	execve(path, argv, envp);
 	perror("execve");
 	free(path);
 	free_argv(envp);
+	free_argv(argv);
 	exit(126);
 }
 
@@ -126,40 +53,19 @@ int	execute_command(t_cmd *cmd, char **argv, t_data *data)
 	{
 		perror("fork");
 		free_argv(envp);
+		exit_cleanup(data);
 		return (1);
 	}
 	waitpid(pid, &status, 0);
+	exit_cleanup(data);//allah belasını versin buranın
+	//koda ekleyince pipelı komutlar leaksiz düzgün çalışıyor ama ls ,ls -l , < , > lı komutlarda double free hatası veriyor
+	//eklemeyince de pipelı komutlar leak veriyor diğerleri düzgün çalışıyor!!
 	free_argv(envp);
 	if (WIFEXITED(status))
 		return (WEXITSTATUS(status));
 	if (WIFSIGNALED(status))
 		return (128 + WTERMSIG(status));
 	return (1);
-}
-
-static void	restore_std_fds(int in, int out)
-{
-	dup2(in, STDIN_FILENO);
-	dup2(out, STDOUT_FILENO);
-	close(in);
-	close(out);
-}
-
-static int	prepare_stdin_for_heredoc(t_cmd *cmd, t_data *data)
-{
-	int	hd_fd;
-
-	if (!cmd->is_heredoc)
-		return (0);
-	hd_fd = handle_heredoc(cmd, data);
-	if (hd_fd == -1)
-	{
-		data->exit_status = 1;
-		return (1);
-	}
-	dup2(hd_fd, STDIN_FILENO);
-	close(hd_fd);
-	return (0);
 }
 
 static int	execute_one_command(t_cmd *cmd, t_data *data)
@@ -178,6 +84,7 @@ static int	execute_one_command(t_cmd *cmd, t_data *data)
 		data->exit_status = execute_command(cmd, cmd->argv, data);
 	return (0);
 }
+
 static void	exec_and_restore(t_cmd *curr, t_data *data)
 {
 	int	in;

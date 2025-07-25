@@ -1,64 +1,38 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   export.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/25 05:16:51 by sbayrak           #+#    #+#             */
+/*   Updated: 2025/07/25 06:57:51 by sbayrak          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-#include "builtin.h"
+#include "minishell.h"
 
-/*int	ft_export(char **argv, t_data *data)
+int	is_valid_key(const char *key)
 {
-	int	i = 1;
+	int	i;
 
-	while (argv[i])
+	i = 0;
+	if (!key || (!ft_isalpha(key[0]) && key[0] != '_'))
+		return (0);
+	while (key[i])
 	{
-		process_export_arg(argv[i], data);
+		if (!ft_isalnum(key[i]) && key[i] != '_')
+			return (0);
 		i++;
 	}
-	return (0);
+	return (1);
 }
 
-void	process_export_arg(char *arg, t_data *data)
+static void	print_export_list(t_env *env)
 {
-	char	*equal_sign;
-	char	*key;
-	char	*value;
+	t_env	*current;
 
-	equal_sign = ft_strchr(arg, '=');
-	if (equal_sign)
-	{
-		*equal_sign = '\0';
-		key = arg;
-		value = equal_sign + 1;
-	}
-	else
-	{
-		key = arg;
-		value = NULL;
-	}
-	if (!is_valid_key(key))
-	{
-		write(2, "export: not a valid identifier\n", 31);
-		return;
-	}
-	if (key && value)
-		update_env_var(data, key, value);
-}*/
-
-int is_valid_key(const char *key)
-{
-    int i = 0;
-
-    if (!key || (!ft_isalpha(key[0]) && key[0] != '_'))
-        return 0;
-
-    while (key[i])
-    {
-        if (!ft_isalnum(key[i]) && key[i] != '_')
-            return 0;
-        i++;
-    }
-    return 1;
-}
-void print_export_list(t_env *env)
-{
-	t_env *current = env;
-
+	current = env;
 	while (current)
 	{
 		printf("declare -x %s", current->key);
@@ -71,15 +45,16 @@ void print_export_list(t_env *env)
 
 int	ft_export(char **argv, t_data *data)
 {
-	int	i = 1;
-	int	has_error = 0;
+	int	i;
+	int	has_error;
 
-	if (!argv[1]) // export tek başına yazılmışsa
+	i = 1;
+	has_error = 0;
+	if (!argv[1])
 	{
-		print_export_list(data->env); // ya da data->env_list, hangisini kullandıysan
+		print_export_list(data->env);
 		return (0);
 	}
-
 	while (argv[i])
 	{
 		if (!process_export_arg(argv[i], data))
@@ -88,7 +63,6 @@ int	ft_export(char **argv, t_data *data)
 	}
 	return (has_error);
 }
-
 
 int	process_export_arg(char *arg, t_data *data)
 {
@@ -111,9 +85,9 @@ int	process_export_arg(char *arg, t_data *data)
 	if (!is_valid_key(key))
 	{
 		write(2, "export: not a valid identifier\n", 31);
-		return (0); // hata
+		return (0);
 	}
 	if (key && value)
 		update_env_var(data, key, value);
-	return (1); // başarı
+	return (1);
 }

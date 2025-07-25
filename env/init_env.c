@@ -1,19 +1,16 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   init_env.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/25 06:58:19 by sbayrak           #+#    #+#             */
+/*   Updated: 2025/07/25 08:14:55 by sbayrak          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
-
-void	ft_free_split(char **split)
-{
-	int	i;
-
-	if (!split)
-		return ;
-	i = 0;
-	while (split[i])
-	{
-		free(split[i]);
-		i++;
-	}
-	free(split);
-}
 
 void	env_add_back(t_env **env, t_env *new_node)
 {
@@ -70,7 +67,7 @@ void	init_env(t_data *data, char **envp)
 		node = malloc(sizeof(t_env));
 		if (!node)
 		{
-			ft_free_split(tmp);
+			free_argv(tmp);
 			continue ;
 		}
 		node->key = ft_strdup(tmp[0]);
@@ -80,6 +77,31 @@ void	init_env(t_data *data, char **envp)
 			node->value = NULL;
 		node->next = NULL;
 		env_add_back(&data->env, node);
-		ft_free_split(tmp);
+		free_argv(tmp);
+	}
+}
+
+void	remove_env_var(t_env **env, const char *key)
+{
+	t_env	*curr;
+	t_env	*prev;
+
+	curr = *env;
+	prev = NULL;
+	while (curr)
+	{
+		if (strcmp(curr->key, key) == 0)
+		{
+			if (prev)
+				prev->next = curr->next;
+			else
+				*env = curr->next;
+			free(curr->key);
+			free(curr->value);
+			free(curr);
+			return ;
+		}
+		prev = curr;
+		curr = curr->next;
 	}
 }

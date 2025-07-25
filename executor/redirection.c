@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   redirection.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/25 05:56:09 by sbayrak           #+#    #+#             */
+/*   Updated: 2025/07/25 05:56:47 by sbayrak          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 int	redirect_in(t_cmd *cmd, t_data *data)
@@ -11,18 +23,21 @@ int	redirect_in(t_cmd *cmd, t_data *data)
 	{
 		data->exit_status = 1;
 		perror(cmd->infile);
+		exit_cleanup(data); // YENİ EKLEDİM BAYA Bİ LEAK AZALTTI
 		return (1); // hata
 	}
 	if (dup2(fd, STDIN_FILENO) == -1)
-	{    
+	{
 		data->exit_status = 1;
-        perror("dup2");
-        close(fd);
-        return (1);
-    }
+		perror("dup2");
+		exit_cleanup(data); // YENİ EKLEDİM BAYA Bİ LEAK AZALTTI
+		close(fd);
+		return (1);
+	}
 	close(fd);
 	return (0);
 }
+
 int	redirect_out(t_cmd *cmd, t_data *data)
 {
 	int	fd;
@@ -39,12 +54,12 @@ int	redirect_out(t_cmd *cmd, t_data *data)
 		return (1); // hata
 	}
 	if (dup2(fd, STDOUT_FILENO) == -1)
-    {    
+	{
 		data->exit_status = 1;
-        perror("dup2");
-        close(fd);
-        return (1);
-    }
+		perror("dup2");
+		close(fd);
+		return (1);
+	}
 	close(fd);
 	return (0);
 }

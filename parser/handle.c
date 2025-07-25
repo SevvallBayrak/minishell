@@ -1,6 +1,16 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   handle.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/25 06:07:19 by sbayrak           #+#    #+#             */
+/*   Updated: 2025/07/25 06:58:52 by sbayrak          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
-#include "utils.h"
-#include "parser.h"
 
 int	handle_word(char *input, t_token **tokens, int i)
 {
@@ -33,7 +43,8 @@ int	handle_quote(char *input, t_token **tokens, int i, t_data *data)
 	char	*word;
 
 	quote = input[i];
-	start = ++i;
+	start = i + 1;
+	i = start;
 	while (input[i] && input[i] != quote)
 		i++;
 	if (!input[i])
@@ -68,14 +79,29 @@ int	handle_redirection(char *input, t_token **tokens, int i, t_data *data)
 	if (is_invalid_redir(input, i, data))
 		return (0);
 	if (input[i] == '>' && input[i + 1] == '>')
-		return (add_token(tokens, ">>", T_REDIR_APPEND, 0), 2);
+	{
+		add_token(tokens, ">>", T_REDIR_APPEND, 0);
+		return (2);
+	}
 	if (input[i] == '<' && input[i + 1] == '<')
-		return (add_token(tokens, "<<", T_HEREDOC, 0), 2);
+	{
+		add_token(tokens, "<<", T_HEREDOC, 0);
+		return (2);
+	}
 	if (input[i] == '>')
-		return (add_token(tokens, ">", T_REDIR_OUT, 0), 1);
+	{
+		add_token(tokens, ">", T_REDIR_OUT, 0);
+		return (1);
+	}
 	if (input[i] == '<')
-		return (add_token(tokens, "<", T_REDIR_IN, 0), 1);
+	{
+		add_token(tokens, "<", T_REDIR_IN, 0);
+		return (1);
+	}
 	if (input[i] == '|')
-		return (add_token(tokens, "|", T_PIPE, 0), 1);
+	{
+		add_token(tokens, "|", T_PIPE, 0);
+		return (1);
+	}
 	return (0);
 }

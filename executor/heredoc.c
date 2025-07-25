@@ -1,8 +1,16 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   heredoc.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/25 05:34:45 by sbayrak           #+#    #+#             */
+/*   Updated: 2025/07/25 05:35:52 by sbayrak          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
-#include <fcntl.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <sys/wait.h>
 
 int	is_expandable_delimiter(const char *delim)
 {
@@ -11,8 +19,8 @@ int	is_expandable_delimiter(const char *delim)
 	if (!delim)
 		return (0);
 	len = ft_strlen(delim);
-	if ((delim[0] == '\'' && delim[len - 1] == '\'') ||
-		(delim[0] == '\"' && delim[len - 1] == '\"'))
+	if ((delim[0] == '\'' && delim[len - 1] == '\'')
+		|| (delim[0] == '\"' && delim[len - 1] == '\"'))
 		return (0);
 	return (1);
 }
@@ -32,13 +40,18 @@ static void	write_heredoc_line(t_data *data, int fd, char *line)
 
 static void	cleanup_tokens(t_data *data)
 {
-	t_token	*tmp;
+	t_token	*current;
+	t_token	*next;
 
-	while (data->tokens->next)
+	current = data->tokens;
+	while (current)
 	{
-		tmp = data->tokens->next;
-		data->tokens = tmp;
+		next = current->next;
+		free(current->value);
+		free(current);
+		current = next;
 	}
+	data->tokens = NULL;
 }
 
 static void	child_heredoc_loop(t_cmd *cmd, t_data *data, int fd)
