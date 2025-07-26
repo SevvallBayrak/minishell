@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 05:27:21 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/25 06:51:07 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/26 06:33:08 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ void	handle_exec_error(int result, char **envp)
 	if (result == PATH_NO_PERMISSION)
 		write(2, " Permission denied\n", 18);
 	else
-		write(2, " command not found\n", 18);
+		write(2, " command not found\n", 19);
 	free_argv(envp);
 	exit(result);
 }

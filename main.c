@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 07:00:04 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/25 07:00:06 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/26 07:06:07 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,30 +149,39 @@ static int parser_exec(t_data *data)
 
 }
 
-int	main(int argc, char **argv, char **envp)
+// Önerilen Düzeltilmiş Yapı
+int main(int argc, char **argv, char **envp)
 {
-	t_data	data;
-	int		i;
+    t_data  data;
+    int     i;
 
-	data_node_null_and_init_sigenv(argc, argv, envp, &data);
-	while (1)
-	{
-		i = readline_lexer(&data);
-		if (i == 0)
-			break;
-		else if (i == 1)
-			continue;
-		i = parser_exec(&data);
-		if (i == 1)
-			continue;
-		free_token_list(data.tokens);
-		if (data.cmds)
-		{
-    		free_cmd_list(data.cmds);
-    		data.cmds = NULL;
-		}
-		free(data.raw_input);
-	}
-	free_env(data.env);
-	return (0);
+    data_node_null_and_init_sigenv(argc, argv, envp, &data);
+    while (1)
+    {
+        // Bellek burada ayrılıyor
+        i = readline_lexer(&data);
+
+        if (i == 0) // Döngüden çıkış (EOF)
+            break;
+
+        // Lexer'da hata olsa bile parser'ı çalıştırmadan temizliğe git
+        if (i != 1) 
+        {
+            parser_exec(&data);
+        }
+
+        // --- TEMİZLİK BLOGU ---
+        // Bu blok artık hata durumlarında (continue yerine) bile çalışacak.
+        free_token_list(data.tokens);
+        if (data.cmds)
+        {
+            free_cmd_list(data.cmds);
+            data.cmds = NULL;
+        }
+        free(data.raw_input);
+    }
+
+    // En son genel temizlik
+    free_env(data.env);
+    return (0);
 }

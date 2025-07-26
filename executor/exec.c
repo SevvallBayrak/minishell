@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 05:22:07 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/25 08:15:12 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/26 05:47:35 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ int	execute_command(t_cmd *cmd, char **argv, t_data *data)
 		return (1);
 	}
 	waitpid(pid, &status, 0);
-	exit_cleanup(data);//allah belasını versin buranın
+	//exit_cleanup(data);//allah belasını versin buranın
 	//koda ekleyince pipelı komutlar leaksiz düzgün çalışıyor ama ls ,ls -l , < , > lı komutlarda double free hatası veriyor
 	//eklemeyince de pipelı komutlar leak veriyor diğerleri düzgün çalışıyor!!
 	free_argv(envp);
@@ -109,12 +109,13 @@ int	executor_execute(t_data *data)
 		return (0);
 	curr = data->cmds;
 	while (curr)
-	{
-		next = curr->next;
-		exec_and_restore(curr, data);
-		free_cmd_list(curr);
-		curr = next;
-	}
+{
+	next = curr->next;
+
+	exec_and_restore(curr, data);
+	free_cmd_list(curr);
+	curr = next;
+}
 	data->cmds = NULL;
 	return (0);
 }

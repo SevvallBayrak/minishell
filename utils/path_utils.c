@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 05:31:16 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/25 06:51:16 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/26 06:54:30 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,14 +72,29 @@ char	*handle_absolute_cmd(char *cmd, int *result)
 char	*get_command_path(char *cmd, t_data *data, int *result)
 {
 	char	*path_env;
+	char	*found_path;
 
 	*result = PATH_NOT_FOUND;
 	if (!cmd)
 		return (NULL);
 	if (cmd[0] == '/' || (cmd[0] == '.' && cmd[1] == '/'))
-		return (handle_absolute_cmd(cmd, result));
+	{
+		if (access(cmd, F_OK) == 0)
+		{
+			if (access(cmd, X_OK) == 0)
+			{
+				*result = PATH_OK;
+				return (ft_strdup(cmd));
+			}
+			*result = PATH_NO_PERMISSION;
+		}
+		return (NULL);
+	}
 	path_env = get_env_value(data->env, "PATH");
 	if (!path_env)
 		return (NULL);
-	return (search_path_dirs(path_env, cmd, result));
+	found_path = search_path_dirs(path_env, cmd, result);
+	free(path_env);
+	return (found_path);
 }
+

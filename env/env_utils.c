@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 06:58:10 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/25 08:13:32 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/26 07:12:43 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ char	*get_env_value(t_env *env_list, const char *key)
 {
 	while (env_list)
 	{
-		if (strcmp(env_list->key, key) == 0)
+		if (ft_strncmp(env_list->key, key, (ft_strlen(key)+1)) == 0)
 		{
 			if (env_list->value)
 				return (ft_strdup(env_list->value));
@@ -35,7 +35,7 @@ void	update_env_var(t_data *data, const char *key, const char *value)
 	env = data->env;
 	while (env)
 	{
-		if (strcmp(env->key, key) == 0)
+		if (ft_strncmp(env->key, key, (ft_strlen(key)+1)) == 0)
 		{
 			free(env->value);
 			env->value = ft_strdup(value);
