@@ -20,21 +20,21 @@ static void	finalize_word_token(t_token **tokens,
 	*quote_type = 0;
 }
 
-static int	handle_quoted_section(char *input, t_data *data,
+static int	handle_quoted_section(t_data *data,
 		int *i, char **word, int *q_type)
 {
 	char	quote_char;
 
-	quote_char = input[*i];
+	quote_char = data->raw_input[*i];
 	if (*q_type == 0)
 		*q_type = odd_or_double_quote(quote_char);
 	(*i)++;
-	while (input[*i] && input[*i] != quote_char)
+	while (data->raw_input[*i] && data->raw_input[*i] != quote_char)
 	{
-		*word = append_char_to_str(*word, input[*i]);
+		*word = append_char_to_str(*word, data->raw_input[*i]);
 		(*i)++;
 	}
-	if (!input[*i])
+	if (!data->raw_input[*i])
 		return (print_unclosed_quote(data));
 	(*i)++;
 	return (1);
@@ -59,7 +59,7 @@ static int	build_and_add_word(char *input, t_token **tokens,
 	{
 		if (input[*i] == '\'' || input[*i] == '"')
 		{
-			if (!handle_quoted_section(input, data, i, &word, &quote_type))
+			if (!handle_quoted_section(data, i, &word, &quote_type))
 			{
 				if (word)
 					free(word);
@@ -74,7 +74,7 @@ static int	build_and_add_word(char *input, t_token **tokens,
 	return (1);
 }
 
-t_token	*lexer(char *input, t_data *data)
+t_token	*lexer(t_data *data)
 {
 	t_token	*tokens;
 	int		i;
@@ -82,20 +82,20 @@ t_token	*lexer(char *input, t_data *data)
 
 	tokens = NULL;
 	i = 0;
-	while (input[i])
+	while (data->raw_input[i])
 	{
-		if (ft_isspace(input[i]))
+		if (ft_isspace(data->raw_input[i]))
 			i++;
-		else if (is_operator(input[i]))
+		else if (is_operator(data->raw_input[i]))
 		{
-			step = handle_redirection(input, &tokens, i, data);
+			step = handle_redirection(data->raw_input, &tokens, i, data);
 			if (step == 0)
 				return (free_token_list(tokens), NULL);
 			i += step;
 		}
 		else
 		{
-			if (!build_and_add_word(input, &tokens, data, &i))
+			if (!build_and_add_word(data->raw_input, &tokens, data, &i))
 				return (free_token_list(tokens), NULL);
 		}
 	}

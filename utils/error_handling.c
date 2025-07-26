@@ -12,6 +12,21 @@
 
 #include "minishell.h"
 
+void	free_argv(char **argv)
+{
+	int	i;
+
+	i = 0;
+	if (!argv)
+		return ;
+	while (argv[i])
+	{
+		free(argv[i]);
+		i++;
+	}
+	free(argv);
+}
+
 char	*append_char_to_str(char *s, char c)
 {
 	char	*new_s;
@@ -35,6 +50,23 @@ char	*append_char_to_str(char *s, char c)
 	new_s[len + 1] = '\0';
 	free(s);
 	return (new_s);
+}
+
+int	is_invalid_redir(const char *input, int i, t_data *data)
+{
+	if (input[i] == '<' && input[i + 1] == '<' && input[i + 2] == '<')
+	{
+		write(2, "minishell: syntax error\n", 25);
+		data->exit_status = 258;
+		return (1);
+	}
+	if (input[i] == '>' && input[i + 1] == '>' && input[i + 2] == '>')
+	{
+		write(2, "minishell: syntax error\n", 25);
+		data->exit_status = 258;
+		return (1);
+	}
+	return (0);
 }
 
 int	print_unclosed_quote(t_data *data)

@@ -57,37 +57,8 @@ int	handle_quote(char *input, t_token **tokens, int i, t_data *data)
 	return (i - start + 2);
 }
 
-int	is_invalid_redir(const char *input, int i, t_data *data)
+int	hanldle_append_heredoc(char *input, t_token **tokens, int i)
 {
-	if (input[i] == '<' && input[i + 1] == '<' && input[i + 2] == '<')
-	{
-		write(2, "minishell: syntax error\n", 25);
-		data->exit_status = 258;
-		return (1);
-	}
-	if (input[i] == '>' && input[i + 1] == '>' && input[i + 2] == '>')
-	{
-		write(2, "minishell: syntax error\n", 25);
-		data->exit_status = 258;
-		return (1);
-	}
-	return (0);
-}
-
-int	handle_redirection(char *input, t_token **tokens, int i, t_data *data)
-{
-	if (is_invalid_redir(input, i, data))
-		return (0);
-	if (input[i] == '>' && input[i + 1] == '>')
-	{
-		add_token(tokens, ">>", T_REDIR_APPEND, 0);
-		return (2);
-	}
-	if (input[i] == '<' && input[i + 1] == '<')
-	{
-		add_token(tokens, "<<", T_HEREDOC, 0);
-		return (2);
-	}
 	if (input[i] == '>')
 	{
 		add_token(tokens, ">", T_REDIR_OUT, 0);
@@ -98,10 +69,30 @@ int	handle_redirection(char *input, t_token **tokens, int i, t_data *data)
 		add_token(tokens, "<", T_REDIR_IN, 0);
 		return (1);
 	}
+	return (0);
+}
+
+int	handle_redirection(char *input, t_token **tokens, int i, t_data *data)
+{
+	if (is_invalid_redir(input, i, data))
+		return (0);
+	if (input[i + 1])
+	{
+		if (input[i] == '>' && input[i + 1] == '>')
+		{
+			add_token(tokens, ">>", T_REDIR_APPEND, 0);
+			return (2);
+		}
+		if (input[i] == '<' && input[i + 1] == '<')
+		{
+			add_token(tokens, "<<", T_HEREDOC, 0);
+			return (2);
+		}
+	}
 	if (input[i] == '|')
 	{
 		add_token(tokens, "|", T_PIPE, 0);
 		return (1);
 	}
-	return (0);
+	return (hanldle_append_heredoc(input, tokens, i));
 }

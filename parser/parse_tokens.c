@@ -16,7 +16,7 @@ int	handle_token(t_token **tok, t_cmd **curr)
 {
 	t_token	*t;
 
-    t = *tok;
+	t = *tok;
 	if (t->type == T_WORD)
 		handle_word_token(t, *curr);
 	else if (t->type == T_PIPE)

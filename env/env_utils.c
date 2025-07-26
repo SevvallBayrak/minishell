@@ -16,7 +16,7 @@ char	*get_env_value(t_env *env_list, const char *key)
 {
 	while (env_list)
 	{
-		if (ft_strncmp(env_list->key, key, (ft_strlen(key)+1)) == 0)
+		if (ft_strncmp(env_list->key, key, (ft_strlen(key) + 1)) == 0)
 		{
 			if (env_list->value)
 				return (ft_strdup(env_list->value));
@@ -35,7 +35,7 @@ void	update_env_var(t_data *data, const char *key, const char *value)
 	env = data->env;
 	while (env)
 	{
-		if (ft_strncmp(env->key, key, (ft_strlen(key)+1)) == 0)
+		if (ft_strncmp(env->key, key, (ft_strlen(key) + 1)) == 0)
 		{
 			free(env->value);
 			env->value = ft_strdup(value);

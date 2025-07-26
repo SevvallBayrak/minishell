@@ -97,4 +97,3 @@ char	*get_command_path(char *cmd, t_data *data, int *result)
 	free(path_env);
 	return (found_path);
 }
-

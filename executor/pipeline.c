@@ -13,23 +13,25 @@
 #include "minishell.h"
 
 static int	handle_pipeline_iteration(t_cmd *curr, t_data *data, pid_t *pids,
-	int *i, int *in_fd)
+	int *in_fd)
 {
 	int		pipefd[2];
 	pid_t	pid;
+	int		i;
 
+	i = 0;
 	if (curr->next && pipe(pipefd) == -1)
-		return (perror("pipe"), cleanup_on_error(pids, *i, *in_fd));
+		return (perror("pipe"), cleanup_on_error(pids, i, *in_fd));
 	pid = fork();
 	if (pid == -1)
-		return (perror("fork"), cleanup_on_error(pids, *i, *in_fd));
+		return (perror("fork"), cleanup_on_error(pids, i, *in_fd));
 	if (pid == 0)
 	{
 		if (pids)
 			free(pids); // burayı ekledim
 		start_pipeline_child(curr, pipefd, *in_fd, data);
 	}
-	pids[(*i)++] = pid;
+	pids[(i)++] = pid;
 	if (*in_fd != STDIN_FILENO)
 		close(*in_fd);
 	if (curr->next)
@@ -42,16 +44,14 @@ static int	handle_pipeline_iteration(t_cmd *curr, t_data *data, pid_t *pids,
 
 static int	run_pipeline_loop(t_cmd *cmds, t_data *data, pid_t *pids)
 {
-	int		i;
 	int		in_fd;
 	t_cmd	*curr;
 
-	i = 0;
 	in_fd = STDIN_FILENO;
 	curr = cmds;
 	while (curr)
 	{
-		if (handle_pipeline_iteration(curr, data, pids, &i, &in_fd))
+		if (handle_pipeline_iteration(curr, data, pids, &in_fd))
 			return (1);
 		curr = curr->next;
 	}

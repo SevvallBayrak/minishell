@@ -112,7 +112,7 @@ void	load_env_from_envp(t_data *data, char **envp);
 void	ensure_pwd_exists(t_data *data);
 
 /* Lexer */
-t_token	*lexer(char *input, t_data *data);
+t_token	*lexer(t_data *data);
 t_token	*create_token(char *value, int type, int quote);
 void	add_token(t_token **head, char *value,
 			t_token_type type, int q_type);
@@ -174,10 +174,11 @@ int		redirect_out(t_cmd *cmd, t_data *data);
 int		validate_syntax(t_token *tok, t_data *data);
 
 /* Expansion */
-char	*expand_variable(t_env *env, char *str, int exit_status);
-void	expand_tokens(t_env *env, t_token *tokens, int exit_status);
+char	*expand_variable(t_data *data, char *str, int i);
+void	expand_tokens(t_data *data, t_token *tokens);
 
 /* Utils */
+int		is_invalid_redir(const char *input, int i, t_data *data);
 char	*ft_strjoin_path(const char *dir, const char *cmd);
 char	*ft_strndup(const char *s1, int a);
 char	*append_char_to_str(char *s, char c);

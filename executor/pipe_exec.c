@@ -36,7 +36,7 @@ int	handle_heredoc_and_redirects(t_cmd *cmd, t_data *data)
 
 void	pipe_child_exec(t_cmd *cmd, int in_fd, int out_fd, t_data *data)
 {
-	int rtn;
+	int	rtn;
 
 	if (in_fd != STDIN_FILENO)
 	{

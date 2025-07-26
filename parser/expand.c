@@ -21,7 +21,7 @@ static void	append_and_replace(char **result, char *addition)
 	*result = temp;
 }
 
-static char	*expand_key(t_env *env, char *str, int i, int *j, int exit_status)
+static char	*expand_key(t_data	*data, char *str, int i, int *j)
 {
 	char	*key;
 	char	*value;
@@ -30,14 +30,14 @@ static char	*expand_key(t_env *env, char *str, int i, int *j, int exit_status)
 	*j = i + 1;
 	if (str[*j] == '?')
 	{
-		key = ft_itoa(exit_status);
+		key = ft_itoa(data->exit_status);
 		(*j)++;
 		return (key);
 	}
 	while (str[*j] && (ft_isalnum(str[*j]) || str[*j] == '_'))
 		(*j)++;
 	key = ft_substr(str, i + 1, *j - i - 1);
-	value = get_env_value(env, key);
+	value = get_env_value(data->env, key);
 	free(key);
 	if (value)
 		result = ft_strdup(value);
@@ -46,18 +46,16 @@ static char	*expand_key(t_env *env, char *str, int i, int *j, int exit_status)
 	return (result);
 }
 
-char	*expand_variable(t_env *env, char *str, int exit_status)
+char	*expand_variable(t_data *data, char *str, int i)
 {
-	int		i;
-	int		j;
 	char	*result;
+	int		j;
 	char	*prefix;
 	char	*key;
 
-	i = 0;
 	result = ft_strdup("");
 	while (str[i])
-	{
+	{	
 		if (str[i] == '$' && str[i + 1]
 			&& (ft_isalnum(str[i + 1]) || str[i + 1] == '_'
 				|| str[i + 1] == '?'))
@@ -65,7 +63,7 @@ char	*expand_variable(t_env *env, char *str, int exit_status)
 			prefix = ft_substr(str, 0, i);
 			append_and_replace(&result, prefix);
 			free(prefix);
-			key = expand_key(env, str, i, &j, exit_status);
+			key = expand_key(data, str, i, &j);
 			append_and_replace(&result, key);
 			free(key);
 			str += j;
@@ -74,11 +72,10 @@ char	*expand_variable(t_env *env, char *str, int exit_status)
 		else
 			i++;
 	}
-	append_and_replace(&result, str);
-	return (result);
+	return (append_and_replace(&result, str), result);
 }
 
-void	expand_tokens(t_env *env, t_token *tokens, int exit_status)
+void	expand_tokens(t_data *data, t_token *tokens)
 {
 	char	*expanded;
 
@@ -87,7 +84,7 @@ void	expand_tokens(t_env *env, t_token *tokens, int exit_status)
 		if (tokens->type == T_WORD && tokens->quote_type != 1
 			&& ft_strchr(tokens->value, '$'))
 		{
-			expanded = expand_variable(env, tokens->value, exit_status);
+			expanded = expand_variable(data, tokens->value, 0);
 			free(tokens->value);
 			tokens->value = expanded;
 		}
