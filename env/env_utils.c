@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 06:58:10 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/26 07:12:43 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/27 00:31:30 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ char	*get_env_value(t_env *env_list, const char *key)
 		if (ft_strncmp(env_list->key, key, (ft_strlen(key) + 1)) == 0)
 		{
 			if (env_list->value)
-				return (ft_strdup(env_list->value));
+				return (env_list->value);
 			return (NULL);
 		}
 		env_list = env_list->next;

@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 05:22:07 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/26 05:47:35 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/27 00:33:38 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void	run_child_process(t_cmd *cmd, char **argv, char **envp, t_data *data)
 		exit(1);
 	}
 	if (!path)
-	{
+	{ 
 		exit_cleanup(data);
 		handle_exec_error(path_result, envp);
 	}

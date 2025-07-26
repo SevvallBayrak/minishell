@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 05:34:45 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/26 06:40:39 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/26 23:32:45 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,32 +33,32 @@ static void	write_and_free_heredoc(char *expanded, int *pipefd, char *line)
 	free(expanded);
 }
 
-static void	chil_heredoc(t_data *data, int *pipefd, t_cmd *cmd, t_token *tmp)
+static void chil_heredoc(t_data *data, int *pipefd, t_cmd *cmd)
 {
-	char	*line;
-	char	*expanded;
+    char    *line;
+    char    *expanded;
 
-	signal(SIGINT, SIG_DFL); // heredoc kırılabilir olsun
-	close(pipefd[0]); // read ucunu kapat
-	while (1)
-	{
-		line = readline("> ");
-		if (!line || ft_strncmp(line, cmd->heredoc_delim,
-				ft_strlen(cmd->heredoc_delim) + 1) == 0)
-			break ;
-		while (data->tokens->next)
-		{
-			tmp = data->tokens->next;
-			data->tokens = tmp;
-		}
-		if (data->tokens->quote_type == 0)
-			expanded = expand_variable(data, line, 0);
-		else
-			expanded = ft_strdup(line);
-		write_and_free_heredoc(expanded, pipefd, line);
-	}
-	free(line);
+    signal(SIGINT, SIG_DFL);
+    close(pipefd[0]);
+    while (1)
+    {
+        line = readline("> ");
+        if (!line || ft_strncmp(line, cmd->heredoc_delim,
+                ft_strlen(cmd->heredoc_delim) + 1) == 0)
+        {
+            free(line); // Döngüden çıkarken line'ı free etmeyi unutma!
+            break ;
+        }
+        // Genişletme kontrolü, cmd yapısındaki bir flag'den gelmeli.
+        // Örneğin: if (cmd->is_expandable)
+        if (is_expandable_delimiter(cmd->heredoc_delim)) // Örnek kontrol
+            expanded = expand_variable(data, line, 0);
+        else
+            expanded = ft_strdup(line);
+        write_and_free_heredoc(expanded, pipefd, line);
+    }
 }
+
 
 static int	parent_heredoc(pid_t pid, int *pipefd)
 {	
@@ -73,25 +73,23 @@ static int	parent_heredoc(pid_t pid, int *pipefd)
 	return (pipefd[0]); // STDIN için bu fd kullanılacak
 }
 
-int	handle_heredoc(t_cmd *cmd, t_data *data)
+int handle_heredoc(t_cmd *cmd, t_data *data)
 {
-	int		pipefd[2];
-	pid_t	pid;
-	t_token	*tmp;
+    int     pipefd[2];
+    pid_t   pid;
 
-	tmp = NULL;
-	if (pipe(pipefd) == -1)
-		return (perror("pipe"), -1);
-	pid = fork();
-	if (pid == -1)
-		return (perror("fork"), -1);
-	if (pid == 0) // CHILD
-	{
-		chil_heredoc(data, pipefd, cmd, tmp);
-		close(pipefd[1]);
-		//free?
-		exit(0);
-	}
-	else // PARENT
-		return (parent_heredoc(pid, pipefd));
+    if (pipe(pipefd) == -1)
+        return (perror("pipe"), -1);
+    pid = fork();
+    if (pid == -1)
+        return (perror("fork"), -1);
+    if (pid == 0)
+    {
+        chil_heredoc(data, pipefd, cmd);
+        close(pipefd[1]);
+		exit_cleanup(data);      
+        exit(0);
+    }
+    else // PARENT
+        return (parent_heredoc(pid, pipefd));
 }

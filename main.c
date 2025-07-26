@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 07:00:04 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/26 07:06:07 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/27 00:13:29 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,31 +88,32 @@ void	data_node_null_and_init_sigenv(int argc, char **argv,
 	init_env(data, envp);
 }
 
-static int	readline_lexer(t_data *data)
+static int  readline_lexer(t_data *data)
 {
-	data->raw_input = readline("minishell> ");
-	if (!data->raw_input)
-	{
-		printf("exit\n");
-		return (0);
-	}
-	add_history(data->raw_input);
-	data->tokens = lexer(data);
-	//print_tokens(data->tokens);
-	if (!data->tokens)
-	{
-		if (data->raw_input)
-			free(data->raw_input);
-		return (1);
-	}
-	if (!validate_syntax(data->tokens, data))
-	{
-		free_token_list(data->tokens);
-		free(data->raw_input);
-		return (1);
-	}
-	expand_tokens(data, data->tokens);
-	return (2);
+    data->raw_input = readline("minishell> ");
+
+    if (!data->raw_input)
+        return (0);
+    if (*data->raw_input == '\0')
+    {
+        free(data->raw_input);
+        return (3);
+    }
+    add_history(data->raw_input);
+    data->tokens = lexer(data);
+    if (!data->tokens)
+    {
+        free(data->raw_input);
+        return (1);
+    }
+    if (!validate_syntax(data->tokens, data))
+    {
+        free_token_list(data->tokens);
+        free(data->raw_input);
+        return (1);
+    }
+    expand_tokens(data, data->tokens);
+    return (2);
 }
 
 static int	parser_exec(t_data *data)
@@ -143,6 +144,8 @@ int	main(int argc, char **argv, char **envp)
 		i = readline_lexer(&data);
 		if (i == 0)
 			break ;
+		if (i == 3)
+			continue;
 		if (i != 1)
 			parser_exec(&data);
 		free_token_list(data.tokens);

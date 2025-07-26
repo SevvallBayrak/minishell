@@ -6,15 +6,11 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 06:48:14 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/25 06:48:54 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/27 00:50:18 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include <signal.h>
-#include <termios.h>
-#include <readline/readline.h>
-#include <readline/history.h>
 
 void	ft_ctrl_c(int sig)
 {

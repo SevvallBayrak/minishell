@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 05:04:08 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/25 06:57:33 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/26 23:40:28 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ static char	*handle_cd_home(t_data *data)
 {
 	char	*path;
 
-	path = get_env_value(data->env, "HOME");
+	path = ft_strdup(get_env_value(data->env, "HOME"));
 	if (!path)
 	{
 		write(2, "cd: HOME not set\n", 17);
@@ -39,7 +39,7 @@ static char	*handle_cd_dash(t_data *data)
 {
 	char	*path;
 
-	path = get_env_value(data->env, "OLDPWD");
+	path = ft_strdup(get_env_value(data->env, "OLDPWD"));
 	if (!path)
 	{
 		write(2, "cd: OLDPWD not set\n", 19);
@@ -70,7 +70,7 @@ int	ft_cd(char **argv, t_data *data)
 	int		ret;
 
 	ret = 0;
-	oldpwd = get_env_value(data->env, "PWD");
+	oldpwd = ft_strdup(get_env_value(data->env, "PWD"));
 	path = get_target_path(argv, data);
 	if (!path)
 		return (free(oldpwd), 1);

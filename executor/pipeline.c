@@ -6,11 +6,20 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 05:36:16 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/25 05:55:09 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/26 22:22:36 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+static void close_file(t_cmd *curr, int *pipefd, int *in_fd)
+{
+	if (curr->next)
+	{
+		close(pipefd[1]);
+		*in_fd = pipefd[0];
+	}
+}
 
 static int	handle_pipeline_iteration(t_cmd *curr, t_data *data, pid_t *pids,
 	int *in_fd)
@@ -20,24 +29,24 @@ static int	handle_pipeline_iteration(t_cmd *curr, t_data *data, pid_t *pids,
 	int		i;
 
 	i = 0;
-	if (curr->next && pipe(pipefd) == -1)
-		return (perror("pipe"), cleanup_on_error(pids, i, *in_fd));
-	pid = fork();
-	if (pid == -1)
-		return (perror("fork"), cleanup_on_error(pids, i, *in_fd));
-	if (pid == 0)
+	while(curr)
 	{
-		if (pids)
-			free(pids); // burayı ekledim
-		start_pipeline_child(curr, pipefd, *in_fd, data);
-	}
-	pids[(i)++] = pid;
-	if (*in_fd != STDIN_FILENO)
-		close(*in_fd);
-	if (curr->next)
-	{
-		close(pipefd[1]);
-		*in_fd = pipefd[0];
+		if (curr->next && pipe(pipefd) == -1)
+			return (perror("pipe"), cleanup_on_error(pids, i, *in_fd));
+		pid = fork();
+		if (pid == -1)
+			return (perror("fork"), cleanup_on_error(pids, i, *in_fd));
+		if (pid == 0)
+		{
+			if (pids)
+				free(pids); // burayı ekledim
+			start_pipeline_child(curr, pipefd, *in_fd, data);
+		}
+		pids[i++] = pid;
+		if (*in_fd != STDIN_FILENO)
+			close(*in_fd);
+		close_file(curr, pipefd, in_fd);
+		curr = curr->next;
 	}
 	return (0);
 }
@@ -49,12 +58,8 @@ static int	run_pipeline_loop(t_cmd *cmds, t_data *data, pid_t *pids)
 
 	in_fd = STDIN_FILENO;
 	curr = cmds;
-	while (curr)
-	{
-		if (handle_pipeline_iteration(curr, data, pids, &in_fd))
-			return (1);
-		curr = curr->next;
-	}
+	if (handle_pipeline_iteration(curr, data, pids, &in_fd))
+		return (1);
 	// if(pids)
 	// 	free(pids);
 	return (0);

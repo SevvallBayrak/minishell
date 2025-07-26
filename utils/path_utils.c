@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 05:31:16 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/26 06:54:30 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/27 00:43:17 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,5 @@ char	*get_command_path(char *cmd, t_data *data, int *result)
 	if (!path_env)
 		return (NULL);
 	found_path = search_path_dirs(path_env, cmd, result);
-	free(path_env);
 	return (found_path);
 }
