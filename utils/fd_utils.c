@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 05:27:21 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/27 00:33:27 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/27 02:37:36 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,23 +59,41 @@ int	print_no_red_next_word_error(t_token *next)
 	return (1);
 }
 
-void	assign_redirection(t_cmd *cmd, t_token *tok)
+static void free_cmd_redirection(t_cmd *cmd)
 {
-	if (tok->type == T_REDIR_IN)
-		cmd->infile = ft_strdup(tok->next->value);
-	else if (tok->type == T_REDIR_OUT)
-	{
-		cmd->outfile = ft_strdup(tok->next->value);
-		cmd->append = 0;
-	}
-	else if (tok->type == T_REDIR_APPEND)
-	{
-		cmd->outfile = ft_strdup(tok->next->value);
-		cmd->append = 1;
-	}
-	else if (tok->type == T_HEREDOC)
-	{
-		cmd->heredoc_delim = ft_strdup(tok->next->value);
-		cmd->is_heredoc = 1;
-	}
+    if (cmd->infile)
+        free(cmd->infile);
+	else if (cmd->outfile)
+    	free(cmd->outfile);
+	else if (cmd->outfile)
+    	free(cmd->outfile);       
+	else if (cmd->heredoc_delim)
+    	free(cmd->heredoc_delim);
+}
+
+void    assign_redirection(t_cmd *cmd, t_token *tok)
+{
+    if (tok->type == T_REDIR_IN)
+    {
+		free_cmd_redirection(cmd);
+        cmd->infile = ft_strdup(tok->next->value); // Sonra yenisini ata
+    }
+    else if (tok->type == T_REDIR_OUT)
+    {
+		free_cmd_redirection(cmd);
+        cmd->outfile = ft_strdup(tok->next->value);
+        cmd->append = 0;
+    }
+    else if (tok->type == T_REDIR_APPEND)
+    {
+		free_cmd_redirection(cmd);
+        cmd->outfile = ft_strdup(tok->next->value);
+        cmd->append = 1;
+    }
+    else if (tok->type == T_HEREDOC)
+    {
+		free_cmd_redirection(cmd);
+        cmd->heredoc_delim = ft_strdup(tok->next->value);
+        cmd->is_heredoc = 1;
+    }
 }

@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 07:00:04 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/27 00:13:29 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/27 02:53:11 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ static int  readline_lexer(t_data *data)
 
     if (!data->raw_input)
         return (0);
-    if (*data->raw_input == '\0')
+    if (!(*data->raw_input))
     {
         free(data->raw_input);
         return (3);
@@ -144,7 +144,7 @@ int	main(int argc, char **argv, char **envp)
 		i = readline_lexer(&data);
 		if (i == 0)
 			break ;
-		if (i == 3)
+		if (i == 1 || i == 3)
 			continue;
 		if (i != 1)
 			parser_exec(&data);
