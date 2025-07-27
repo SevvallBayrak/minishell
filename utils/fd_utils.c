@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 05:27:21 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/27 04:15:16 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/27 18:21:28 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,13 +64,20 @@ int	print_no_red_next_word_error(t_token *next)
 static void free_cmd_redirection(t_cmd *cmd)
 {
     if (cmd->infile)
-        free(cmd->infile);
+	{
+		free(cmd->infile);
+		cmd->infile = NULL;
+	}
 	else if (cmd->outfile)
-    	free(cmd->outfile);
-	else if (cmd->outfile)
-    	free(cmd->outfile);       
+	{
+		free(cmd->outfile);
+		cmd->outfile = NULL;
+	}
 	else if (cmd->heredoc_delim)
-    	free(cmd->heredoc_delim);
+	{
+		free(cmd->heredoc_delim);
+		cmd->heredoc_delim = NULL;
+	}
 }
 
 void    assign_redirection(t_cmd *cmd, t_token *tok)

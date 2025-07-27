@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 07:00:04 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/27 07:03:22 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/27 18:22:05 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,8 @@ void	free_cmd_list(t_cmd *cmd)
 			free(cmd->outfile);
 		if (cmd->heredoc_delim)
 			free(cmd->heredoc_delim);
-		free(cmd);
+		if(cmd)
+			free(cmd);
 		cmd = tmp;
 	}
 }

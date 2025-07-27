@@ -50,10 +50,7 @@ void	pipe_child_exec(t_cmd *cmd, int in_fd, int out_fd, t_data *data)
 	}
 	if (handle_heredoc_and_redirects(cmd, data))
 	{
-		free_cmd_list(data->cmds);
-		free(data->raw_input);
-		free_env(data->env);
-		free(data);
+		exit_cleanup(data);
 		exit(1);
 	}
 	if (is_builtin(cmd->argv[0]))

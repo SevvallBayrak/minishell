@@ -11,21 +11,12 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include <unistd.h>    // write için
-#include <stdlib.h>    // exit için
-#include <stdio.h>     // perror için
-#include <signal.h>    // signal için
-#include <termios.h>   // tcgetattr, tcsetattr, ECHOCTL için
-#include <readline/readline.h> // rl_on_new_line, rl_replace_line, rl_redisplay, rl_line_buffer için
-#include <string.h>    // ft_strlen için (veya kendi ft_strlen'in)
 
-// rl_line_buffer global değişkeni readline/readline.h içinde tanımlıdır.
-extern char *rl_line_buffer; // <-- BU SATIR ÖNEMLİ: rl_line_buffer'ı bildirir
 
-// Global flag for SIGQUIT handling
+
 volatile sig_atomic_t g_sigquit_flag = 0;
 
-// Ctrl+C (SIGINT) için işleyici
+
 void    ft_ctrl_c(int sig)
 {
     (void)sig;
