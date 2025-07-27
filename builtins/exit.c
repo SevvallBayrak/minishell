@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 05:14:01 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/27 00:16:14 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/27 06:45:17 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,20 +30,22 @@ static int	is_numeric(const char *str)
 	return (1);
 }
 
-void	free_env(t_env *env)
+// free_utils.c veya env_utils.c (free_env fonksiyonu)
+void free_env(t_env *env_list)
 {
-	t_env	*tmp;
+    t_env *current = env_list;
+    t_env *next_node;
 
-	while (env)
-	{
-		tmp = env->next;
-		if (env->key)
-			free(env->key);
-		if (env->value)
-			free(env->value);
-		free(env);
-		env = tmp;
-	}
+    while (current)
+    {
+        next_node = current->next;
+        if (current->key)
+            free(current->key); // Anahtarı serbest bırak
+        if (current->value)
+            free(current->value); // Değeri serbest bırak
+        free(current); // Düğümün kendisini serbest bırak
+        current = next_node;
+    }
 }
 
 void	exit_cleanup(t_data *data)

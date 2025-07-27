@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 07:00:04 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/27 04:37:34 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/27 07:03:22 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,6 +92,15 @@ static int  readline_lexer(t_data *data)
 {
     data->raw_input = readline("minishell> ");
 
+    // SIGQUIT flag kontrol et
+    if (g_sigquit_flag)
+    {
+        g_sigquit_flag = 0;  // Flag'i reset et
+        if (data->raw_input)
+            free(data->raw_input);
+        return (-1);  // Özel exit kodu
+    }
+
     if (!data->raw_input)
         return (0);
     if (!(*data->raw_input))
@@ -101,7 +110,6 @@ static int  readline_lexer(t_data *data)
     }
     add_history(data->raw_input);
     data->tokens = lexer(data);
-	//print_tokens(data->tokens);
     if (!data->tokens)
     {
         free(data->raw_input);
@@ -145,6 +153,13 @@ int	main(int argc, char **argv, char **envp)
 		i = readline_lexer(&data);
 		if (i == 0)
 			break ;
+		if (i == -1)  // SIGQUIT durumu - temiz çıkış
+		{
+			rl_clear_history();
+			if (data.env)
+				free_env(data.env);
+			exit(131);
+		}
 		if (i == 1 || i == 3)
 			continue;
 		if (i != 1)

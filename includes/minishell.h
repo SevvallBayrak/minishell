@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 06:55:36 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/27 00:33:44 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/27 07:03:22 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
 # include <sys/wait.h>
 # include <termios.h>
 
-extern int	g_exit_status;
+extern volatile sig_atomic_t g_sigquit_flag;
 
 typedef enum e_path_result
 {
@@ -84,6 +84,8 @@ void	init_signal(void);
 void	setup_signal_handlers(void);
 void	set_ignore_signals(void);
 void	set_default_signals(void);
+void ft_free_split(char **split_array);
+
 
 /* Builtin */
 int		is_builtin(const char *cmd);
