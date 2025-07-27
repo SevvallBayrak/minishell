@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 05:22:07 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/27 00:33:38 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/27 04:36:25 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,15 @@ int	execute_command(t_cmd *cmd, char **argv, t_data *data)
 static int	execute_one_command(t_cmd *cmd, t_data *data)
 {
 	if (!cmd->argv)
+	{
+		if (cmd->is_heredoc)
+		{
+			if (prepare_stdin_for_heredoc(cmd, data))
+				return (1);
+			data->exit_status = 0;
+		}
 		return (1);
+	}
 	if (prepare_stdin_for_heredoc(cmd, data))
 		return (1);
 	if (is_builtin(cmd->argv[0]))

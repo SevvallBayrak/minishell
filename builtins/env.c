@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 05:09:56 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/25 06:57:42 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/27 03:31:35 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,14 @@
 int	ft_env(t_data *data)
 {
 	t_env	*env;
+	char	*path_value;
+
+	path_value = get_env_value(data->env, "PATH");
+	if (!path_value)
+	{
+		ft_putstr_fd("env: No such file or directory\n", 2);
+		return (127);
+	}
 
 	env = data->env;
 	while (env)

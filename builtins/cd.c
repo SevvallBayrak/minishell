@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 05:04:08 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/26 23:40:28 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/27 03:52:20 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,42 +24,22 @@ static void	update_pwd_vars(t_data *data, const char *oldpwd)
 
 static char	*handle_cd_home(t_data *data)
 {
-	char	*path;
+	char	*home_value;
 
-	path = ft_strdup(get_env_value(data->env, "HOME"));
-	if (!path)
+	home_value = get_env_value(data->env, "HOME");
+	if (!home_value)
 	{
 		write(2, "cd: HOME not set\n", 17);
 		return (NULL);
 	}
-	return (path);
+	return ((home_value));
 }
 
-static char	*handle_cd_dash(t_data *data)
-{
-	char	*path;
-
-	path = ft_strdup(get_env_value(data->env, "OLDPWD"));
-	if (!path)
-	{
-		write(2, "cd: OLDPWD not set\n", 19);
-		return (NULL);
-	}
-	if (write(1, path, strlen(path)) == -1
-		|| write(1, "\n", 1) == -1)
-	{
-		perror("cd: write error");
-		return (NULL);
-	}
-	return (path);
-}
 
 static char	*get_target_path(char **argv, t_data *data)
 {
-	if (!argv[1])
+	if (!argv[1] || ft_strncmp(argv[1], "~", 2) == 0)
 		return (handle_cd_home(data));
-	if (strcmp(argv[1], "-") == 0)
-		return (handle_cd_dash(data));
 	return (argv[1]);
 }
 
@@ -86,8 +66,6 @@ int	ft_cd(char **argv, t_data *data)
 	}
 	if (!ret)
 		update_pwd_vars(data, oldpwd);
-	if (path != argv[1])
-		free(path);
 	free(oldpwd);
 	return (ret);
 }

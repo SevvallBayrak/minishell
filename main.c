@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 07:00:04 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/27 02:53:11 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/27 04:37:34 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,49 +31,49 @@ void	free_cmd_list(t_cmd *cmd)
 	}
 }
 
-// void	print_cmd_list(t_cmd *cmds)
-// {
-// 	int i;
-// 	int index = 1;
+void	print_cmd_list(t_cmd *cmds)
+{
+	int i;
+	int index = 1;
 
-// 	while (cmds)
-// 	{
-// 		printf("🔹 Command Block %d:\n", index++);
+	while (cmds)
+	{
+		printf("🔹 Command Block %d:\n", index++);
 
-// 		// Argüman listesi (argv)
-// 		i = 0;
-// 		if (cmds->argv)
-// 		{
-// 			printf("  argv: ");
-// 			while (cmds->argv[i])
-// 				printf("[%s] ", cmds->argv[i++]);
-// 			printf("\n");
-// 		}
-// 		else
-// 			printf("  argv: (null)\n");
+		// Argüman listesi (argv)
+		i = 0;
+		if (cmds->argv)
+		{
+			printf("  argv: ");
+			while (cmds->argv[i])
+				printf("[%s] ", cmds->argv[i++]);
+			printf("\n");
+		}
+		else
+			printf("  argv: (null)\n");
 
-// 		// Redirection'lar
-// 		if (cmds->infile)
-// 			printf("  infile: %s\n", cmds->infile);
-// 		if (cmds->outfile)
-// 			printf("  outfile: %s (append=%d)\n", cmds->outfile, cmds->append);
-// 		if (cmds->is_heredoc)
-// 			printf("  heredoc_delim: %s\n", cmds->heredoc_delim);
+		// Redirection'lar
+		if (cmds->infile)
+			printf("  infile: %s\n", cmds->infile);
+		if (cmds->outfile)
+			printf("  outfile: %s (append=%d)\n", cmds->outfile, cmds->append);
+		if (cmds->is_heredoc)
+			printf("  heredoc_delim: %s\n", cmds->heredoc_delim);
 
-// 		// Sonraki komuta geç
-// 		cmds = cmds->next;
-// 		printf("\n");
-// 	}
-// }
+		// Sonraki komuta geç
+		cmds = cmds->next;
+		printf("\n");
+	}
+}
 
-// void print_tokens(t_token *tokens)
-// {
-//     while (tokens)
-//     {
-//         printf("Token → Type: %d, Value: %s\n", tokens->type, tokens->value);
-//         tokens = tokens->next;
-//     }
-// }
+void print_tokens(t_token *tokens)
+{
+    while (tokens)
+    {
+        printf("Token → Type: %d, Value: %s\n", tokens->type, tokens->value);
+        tokens = tokens->next;
+    }
+}
 
 void	data_node_null_and_init_sigenv(int argc, char **argv,
 							char **envp, t_data *data)
@@ -101,6 +101,7 @@ static int  readline_lexer(t_data *data)
     }
     add_history(data->raw_input);
     data->tokens = lexer(data);
+	//print_tokens(data->tokens);
     if (!data->tokens)
     {
         free(data->raw_input);
