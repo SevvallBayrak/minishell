@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 07:00:04 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/27 18:22:05 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/27 22:20:58 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,6 +159,8 @@ int	main(int argc, char **argv, char **envp)
 			rl_clear_history();
 			if (data.env)
 				free_env(data.env);
+			if (data.exported_vars)
+				free_env(data.exported_vars);
 			exit(131);
 		}
 		if (i == 1 || i == 3)
@@ -175,6 +177,8 @@ int	main(int argc, char **argv, char **envp)
 			free(data.raw_input);
 	}
 	free_env(data.env);
+	if (data.exported_vars)
+		free_env(data.exported_vars);
 	return (0);
 }
 

@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 05:14:01 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/27 06:45:17 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/27 22:20:58 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,8 @@ void	exit_cleanup(t_data *data)
 		free_cmd_list(data->cmds);
 	if (data->env)
 		free_env(data->env);
+	if (data->exported_vars)
+		free_env(data->exported_vars);
 	if (data->raw_input)
 		free(data->raw_input);
 }

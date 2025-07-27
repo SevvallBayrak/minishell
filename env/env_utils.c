@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 06:58:10 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/27 00:31:30 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/27 22:23:25 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ char	*get_env_value(t_env *env_list, const char *key)
 	}
 	return (NULL);
 }
-
 void	update_env_var(t_data *data, const char *key, const char *value)
 {
 	t_env	*env;
@@ -39,6 +38,7 @@ void	update_env_var(t_data *data, const char *key, const char *value)
 		{
 			free(env->value);
 			env->value = ft_strdup(value);
+			env->is_export_only = 0; // Artık env değişkeni oldu
 			return ;
 		}
 		env = env->next;
@@ -48,6 +48,7 @@ void	update_env_var(t_data *data, const char *key, const char *value)
 		return ;
 	new_node->key = ft_strdup(key);
 	new_node->value = ft_strdup(value);
+	new_node->is_export_only = 0;
 	new_node->next = NULL;
 	env_add_back(&data->env, new_node);
 }
@@ -103,4 +104,30 @@ char	**env_to_envp(t_env *env)
 	}
 	envp[i] = NULL;
 	return (envp);
+}
+
+void	add_exported_var(t_data *data, const char *key)
+{
+	t_env	*new_node;
+
+	if (find_exported_var(data->exported_vars, key))
+		return ;
+	new_node = malloc(sizeof(t_env));
+	if (!new_node)
+		return ;
+	new_node->key = ft_strdup(key);
+	new_node->value = NULL;
+	new_node->next = NULL;
+	env_add_back(&data->exported_vars, new_node);
+}
+
+t_env	*find_exported_var(t_env *exported_vars, const char *key)
+{
+	while (exported_vars)
+	{
+		if (ft_strncmp(exported_vars->key, key, (ft_strlen(key) + 1)) == 0)
+			return (exported_vars);
+		exported_vars = exported_vars->next;
+	}
+	return (NULL);
 }

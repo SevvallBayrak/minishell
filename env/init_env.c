@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 06:58:19 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/27 06:48:28 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/27 22:20:58 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,7 @@ void	init_env(t_data *data, char **envp)
 	char	**tmp;
 	t_env	*node;
 
+	data->exported_vars = NULL;
 	i = -1;
 	while (envp[++i])
 	{

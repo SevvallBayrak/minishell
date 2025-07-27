@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 06:55:36 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/27 07:03:22 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/27 22:23:52 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,7 @@ typedef struct s_env
 	char			*key;
 	char			*value;
 	struct s_env	*next;
+	int			is_export_only;
 }	t_env;
 
 typedef struct s_data
@@ -76,6 +77,7 @@ typedef struct s_data
 	t_token	*tokens;
 	t_cmd	*cmds;
 	t_env	*env;
+	t_env	*exported_vars;
 	int		exit_status;
 }	t_data;
 
@@ -112,6 +114,8 @@ char	**env_to_envp(t_env *env);
 void	init_env(t_data *data, char **envp);
 void	load_env_from_envp(t_data *data, char **envp);
 void	ensure_pwd_exists(t_data *data);
+void	add_exported_var(t_data *data, const char *key);
+t_env	*find_exported_var(t_env *exported_vars, const char *key);
 
 /* Lexer */
 t_token	*lexer(t_data *data);

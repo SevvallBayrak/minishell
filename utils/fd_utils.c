@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 05:27:21 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/27 18:21:28 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/27 22:13:41 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,6 @@ int	prepare_stdin_for_heredoc(t_cmd *cmd, t_data *data)
 {
 	int	hd_fd;
 
-	if(!cmd->argv)
-		return(1); 
 	if (!cmd->is_heredoc)
 		return (0);
 	hd_fd = handle_heredoc(cmd, data);

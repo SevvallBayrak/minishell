@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 05:16:51 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/25 06:57:51 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/27 22:22:00 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ int	process_export_arg(char *arg, t_data *data)
 	char	*equal_sign;
 	char	*key;
 	char	*value;
+	t_env	*env;
 
 	equal_sign = ft_strchr(arg, '=');
 	if (equal_sign)
@@ -87,7 +88,27 @@ int	process_export_arg(char *arg, t_data *data)
 		write(2, "export: not a valid identifier\n", 31);
 		return (0);
 	}
-	if (key && value)
-		update_env_var(data, key, value);
+	env = data->env;
+	while (env)
+	{
+		if (ft_strncmp(env->key, key, (ft_strlen(key) + 1)) == 0)
+		{
+			if (value)
+			{
+				free(env->value);
+				env->value = ft_strdup(value);
+			}
+			return (1);
+		}
+		env = env->next;
+	}
+	// env'de yoksa yeni node ekle
+	t_env	*new_node;
+
+	new_node = malloc(sizeof(t_env));
+	new_node->key = ft_strdup(key);
+	new_node->value = value ? ft_strdup(value) : NULL;
+	new_node->next = NULL;
+	env_add_back(&data->env, new_node);
 	return (1);
 }
