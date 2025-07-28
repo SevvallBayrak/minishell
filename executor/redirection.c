@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 05:56:09 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/25 05:56:47 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/28 16:33:52 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,14 +23,14 @@ int	redirect_in(t_cmd *cmd, t_data *data)
 	{
 		data->exit_status = 1;
 		perror(cmd->infile);
-		exit_cleanup(data); // YENİ EKLEDİM BAYA Bİ LEAK AZALTTI
-		return (1); // hata
+		exit_cleanup(data);
+		return (1);
 	}
 	if (dup2(fd, STDIN_FILENO) == -1)
 	{
 		data->exit_status = 1;
 		perror("dup2");
-		exit_cleanup(data); // YENİ EKLEDİM BAYA Bİ LEAK AZALTTI
+		exit_cleanup(data);
 		close(fd);
 		return (1);
 	}
@@ -51,7 +51,7 @@ int	redirect_out(t_cmd *cmd, t_data *data)
 	if (fd < 0)
 	{
 		perror(cmd->outfile);
-		return (1); // hata
+		return (1);
 	}
 	if (dup2(fd, STDOUT_FILENO) == -1)
 	{

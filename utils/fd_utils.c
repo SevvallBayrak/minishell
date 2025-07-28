@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 05:27:21 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/27 22:13:41 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/28 16:45:44 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,17 +51,16 @@ int	print_no_red_next_word_error(t_token *next)
 {
 	if (!next || next->type != T_WORD)
 	{
-		write(2,
-			"minishell: syntax error near unexpected token `newline'\n",
+		write(2, "minishell: syntax error near unexpected token `newline'\n",
 			57);
 		return (0);
 	}
 	return (1);
 }
 
-static void free_cmd_redirection(t_cmd *cmd)
+static void	free_cmd_redirection(t_cmd *cmd)
 {
-    if (cmd->infile)
+	if (cmd->infile)
 	{
 		free(cmd->infile);
 		cmd->infile = NULL;
@@ -78,29 +77,29 @@ static void free_cmd_redirection(t_cmd *cmd)
 	}
 }
 
-void    assign_redirection(t_cmd *cmd, t_token *tok)
+void	assign_redirection(t_cmd *cmd, t_token *tok)
 {
-    if (tok->type == T_REDIR_IN)
-    {
+	if (tok->type == T_REDIR_IN)
+	{
 		free_cmd_redirection(cmd);
-        cmd->infile = ft_strdup(tok->next->value); // Sonra yenisini ata
-    }
-    else if (tok->type == T_REDIR_OUT)
-    {
+		cmd->infile = ft_strdup(tok->next->value);
+	}
+	else if (tok->type == T_REDIR_OUT)
+	{
 		free_cmd_redirection(cmd);
-        cmd->outfile = ft_strdup(tok->next->value);
-        cmd->append = 0;
-    }
-    else if (tok->type == T_REDIR_APPEND)
-    {
+		cmd->outfile = ft_strdup(tok->next->value);
+		cmd->append = 0;
+	}
+	else if (tok->type == T_REDIR_APPEND)
+	{
 		free_cmd_redirection(cmd);
-        cmd->outfile = ft_strdup(tok->next->value);
-        cmd->append = 1;
-    }
-    else if (tok->type == T_HEREDOC)
-    {
+		cmd->outfile = ft_strdup(tok->next->value);
+		cmd->append = 1;
+	}
+	else if (tok->type == T_HEREDOC)
+	{
 		free_cmd_redirection(cmd);
-        cmd->heredoc_delim = ft_strdup(tok->next->value);
-        cmd->is_heredoc = 1;
-    }
+		cmd->heredoc_delim = ft_strdup(tok->next->value);
+		cmd->is_heredoc = 1;
+	}
 }

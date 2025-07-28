@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 05:04:08 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/27 03:52:20 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/28 15:49:04 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,9 +32,8 @@ static char	*handle_cd_home(t_data *data)
 		write(2, "cd: HOME not set\n", 17);
 		return (NULL);
 	}
-	return ((home_value));
+	return (home_value);
 }
-
 
 static char	*get_target_path(char **argv, t_data *data)
 {

@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 05:49:22 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/26 21:27:57 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/28 16:29:57 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,10 +34,23 @@ int	handle_heredoc_and_redirects(t_cmd *cmd, t_data *data)
 	return (0);
 }
 
-void	pipe_child_exec(t_cmd *cmd, int in_fd, int out_fd, t_data *data)
+static void	execute_and_exit(t_cmd *cmd, t_data *data)
 {
 	int	rtn;
 
+	if (is_builtin(cmd->argv[0]))
+	{
+		rtn = exec_builtin(cmd, data);
+		exit_cleanup(data);
+		exit(rtn);
+	}
+	rtn = execute_command(cmd, cmd->argv, data);
+	exit_cleanup(data);
+	exit(rtn);
+}
+
+void	pipe_child_exec(t_cmd *cmd, int in_fd, int out_fd, t_data *data)
+{
 	if (in_fd != STDIN_FILENO)
 	{
 		dup2(in_fd, STDIN_FILENO);
@@ -53,15 +66,7 @@ void	pipe_child_exec(t_cmd *cmd, int in_fd, int out_fd, t_data *data)
 		exit_cleanup(data);
 		exit(1);
 	}
-	if (is_builtin(cmd->argv[0]))
-	{
-    	rtn = exec_builtin(cmd, data);
-    	exit_cleanup(data); 
-    	exit(rtn);
-	}
-	rtn = execute_command(cmd, cmd->argv, data);
-	exit_cleanup(data);
-	exit(rtn);
+	execute_and_exit(cmd, data);
 }
 
 void	start_pipeline_child(t_cmd *cmd, int *pipefd, int in_fd, t_data *data)

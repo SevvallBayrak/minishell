@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 05:16:51 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/27 22:22:00 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/28 15:54:22 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,31 +64,28 @@ int	ft_export(char **argv, t_data *data)
 	return (has_error);
 }
 
-int	process_export_arg(char *arg, t_data *data)
+static t_env	*create_new_env_node(char *key, char *value)
 {
-	char	*equal_sign;
-	char	*key;
-	char	*value;
-	t_env	*env;
+	t_env	*new_node;
 
-	equal_sign = ft_strchr(arg, '=');
-	if (equal_sign)
+	new_node = malloc(sizeof(t_env));
+	if (!new_node)
+		return (NULL);
+	new_node->key = ft_strdup(key);
+	if (value)
 	{
-		*equal_sign = '\0';
-		key = arg;
-		value = equal_sign + 1;
+		new_node->value = ft_strdup(value);
 	}
 	else
 	{
-		key = arg;
-		value = NULL;
+		new_node->value = NULL;
 	}
-	if (!is_valid_key(key))
-	{
-		write(2, "export: not a valid identifier\n", 31);
-		return (0);
-	}
-	env = data->env;
+	new_node->next = NULL;
+	return (new_node);
+}
+
+static int	update_existing_env(t_env *env, char *key, char *value)
+{
 	while (env)
 	{
 		if (ft_strncmp(env->key, key, (ft_strlen(key) + 1)) == 0)
@@ -102,13 +99,44 @@ int	process_export_arg(char *arg, t_data *data)
 		}
 		env = env->next;
 	}
-	// env'de yoksa yeni node ekle
+	return (0);
+}
+
+static void	split_key_value(char *arg, char **key, char **value)
+{
+	char	*equal_sign;
+
+	equal_sign = ft_strchr(arg, '=');
+	if (equal_sign)
+	{
+		*equal_sign = '\0';
+		*key = arg;
+		*value = equal_sign + 1;
+	}
+	else
+	{
+		*key = arg;
+		*value = NULL;
+	}
+}
+
+int	process_export_arg(char *arg, t_data *data)
+{
+	char	*key;
+	char	*value;
 	t_env	*new_node;
 
-	new_node = malloc(sizeof(t_env));
-	new_node->key = ft_strdup(key);
-	new_node->value = value ? ft_strdup(value) : NULL;
-	new_node->next = NULL;
+	split_key_value(arg, &key, &value);
+	if (!is_valid_key(key))
+	{
+		write(2, "export: not a valid identifier\n", 31);
+		return (0);
+	}
+	if (update_existing_env(data->env, key, value))
+		return (1);
+	new_node = create_new_env_node(key, value);
+	if (!new_node)
+		return (0);
 	env_add_back(&data->env, new_node);
 	return (1);
 }

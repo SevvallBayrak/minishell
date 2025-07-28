@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 07:00:04 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/27 22:33:01 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/28 17:38:06 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,20 @@ void	data_node_null_and_init_sigenv(int argc, char **argv,
 	init_env(data, envp);
 }
 
+void	check_signal_exit_status(t_data *data)
+{
+	if (g_sigquit_flag == 130)
+	{
+		data->exit_status = 130;
+		g_sigquit_flag = 0;
+	}
+	else if (g_sigquit_flag == 131)
+	{
+		data->exit_status = 131;
+		g_sigquit_flag = 0;
+	}
+}
+
 static int	readline_lexer_part2(t_data *data)
 {
 	if (!validate_syntax(data->tokens, data))
@@ -64,7 +78,8 @@ static int	readline_lexer_part2(t_data *data)
 static int	readline_lexer(t_data *data)
 {
 	data->raw_input = readline("minishell> ");
-	if (g_sigquit_flag)
+	check_signal_exit_status(data);
+	if (g_sigquit_flag == 131)
 	{
 		g_sigquit_flag = 0;
 		if (data->raw_input)
@@ -120,6 +135,7 @@ void	main_loop(t_data *data)
 
 	while (1)
 	{
+		check_signal_exit_status(data);
 		i = readline_lexer(data);
 		if (i == 0)
 			break ;

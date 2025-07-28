@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 06:58:19 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/27 22:20:58 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/28 16:20:39 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,22 @@ void	node_value(char **tmp, t_env *node)
 	}
 }
 
+static t_env	*create_env_node(char **tmp)
+{
+	t_env	*node;
+
+	node = malloc(sizeof(t_env));
+	if (!node)
+		return (NULL);
+	node->key = ft_strdup(tmp[0]);
+	if (tmp[1])
+		node_value(tmp, node);
+	else
+		node->value = NULL;
+	node->next = NULL;
+	return (node);
+}
+
 void	init_env(t_data *data, char **envp)
 {
 	int		i;
@@ -65,18 +81,12 @@ void	init_env(t_data *data, char **envp)
 		tmp = ft_split(envp[i], '=');
 		if (!tmp)
 			continue ;
-		node = malloc(sizeof(t_env));
+		node = create_env_node(tmp);
 		if (!node)
 		{
 			free_argv(tmp);
 			continue ;
 		}
-		node->key = ft_strdup(tmp[0]);
-		if (tmp[1])
-			node_value(tmp, node);
-		else
-			node->value = NULL;
-		node->next = NULL;
 		env_add_back(&data->env, node);
 		free_argv(tmp);
 	}

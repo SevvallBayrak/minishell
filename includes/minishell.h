@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 06:55:36 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/27 22:23:52 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/28 16:40:49 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
 # include <sys/wait.h>
 # include <termios.h>
 
-extern volatile sig_atomic_t g_sigquit_flag;
+extern volatile sig_atomic_t	g_sigquit_flag;
 
 typedef enum e_path_result
 {
@@ -68,7 +68,7 @@ typedef struct s_env
 	char			*key;
 	char			*value;
 	struct s_env	*next;
-	int			is_export_only;
+	int				is_export_only;
 }	t_env;
 
 typedef struct s_data
@@ -86,8 +86,7 @@ void	init_signal(void);
 void	setup_signal_handlers(void);
 void	set_ignore_signals(void);
 void	set_default_signals(void);
-void ft_free_split(char **split_array);
-
+void	ft_free_split(char **split_array);
 
 /* Builtin */
 int		is_builtin(const char *cmd);
@@ -120,21 +119,17 @@ t_env	*find_exported_var(t_env *exported_vars, const char *key);
 /* Lexer */
 t_token	*lexer(t_data *data);
 t_token	*create_token(char *value, int type, int quote);
-void	add_token(t_token **head, char *value,
-			t_token_type type, int q_type);
+void	add_token(t_token **head, char *value, t_token_type type, int q_type);
 void	free_token_list(t_token *list);
-int		handle_quote(char *input, t_token **tokens,
-			int i, t_data *data);
-int		handle_redirection(char *input, t_token **tokens,
-			int i, t_data *data);
+int		handle_quote(char *input, t_token **tokens, int i, t_data *data);
+int		handle_redirection(char *input, t_token **tokens, int i, t_data *data);
 int		handle_word(char *input, t_token **tokens, int i);
 int		print_no_red_next_word_error(t_token *next);
 int		is_operator(char c);
 int		is_special_char(char c);
 int		ft_isspace(char c);
 int		check_unclosed_quotes(const char *str);
-int		dispatch_lexer(char *input, int i,
-			t_token **tokens, t_data *data);
+int		dispatch_lexer(char *input, int i, t_token **tokens, t_data *data);
 int		odd_or_double_quote(char quote);
 int		print_unclosed_quote(t_data *data);
 
@@ -163,8 +158,7 @@ void	handle_exec_error(int result, char **envp);
 int		has_pipe(t_cmd *cmds);
 int		run_pipeline(t_cmd *cmds, t_data *data);
 void	pipe_child_exec(t_cmd *cmd, int in_fd, int out_fd, t_data *data);
-void	start_pipeline_child(t_cmd *cmd, int *pipefd,
-			int in_fd, t_data *data);
+void	start_pipeline_child(t_cmd *cmd, int *pipefd, int in_fd, t_data *data);
 void	close_pipe_ends(int *pipefd);
 int		count_commands(t_cmd *cmds);
 int		wait_all_children(pid_t *pids, int num_cmds);

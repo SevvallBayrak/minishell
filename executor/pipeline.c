@@ -5,14 +5,14 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/25 05:36:16 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/27 03:26:09 by sbayrak          ###   ########.fr       */
+/*   Created: 2025/07/28 16:32:40 by sbayrak           #+#    #+#             */
+/*   Updated: 2025/07/28 16:33:30 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static void close_file(t_cmd *curr, int *pipefd, int *in_fd)
+static void	close_file(t_cmd *curr, int *pipefd, int *in_fd)
 {
 	if (curr->next)
 	{
@@ -29,7 +29,7 @@ static int	handle_pipeline_iteration(t_cmd *curr, t_data *data, pid_t *pids,
 	int		i;
 
 	i = 0;
-	while(curr)
+	while (curr)
 	{
 		if (curr->next && pipe(pipefd) == -1)
 			return (perror("pipe"), cleanup_on_error(pids, i, *in_fd));
@@ -39,7 +39,7 @@ static int	handle_pipeline_iteration(t_cmd *curr, t_data *data, pid_t *pids,
 		if (pid == 0)
 		{
 			if (pids)
-				free(pids); // burayı ekledim
+				free(pids);
 			start_pipeline_child(curr, pipefd, *in_fd, data);
 		}
 		pids[i++] = pid;
@@ -60,8 +60,6 @@ static int	run_pipeline_loop(t_cmd *cmds, t_data *data, pid_t *pids)
 	curr = cmds;
 	if (handle_pipeline_iteration(curr, data, pids, &in_fd))
 		return (1);
-	// if(pids)
-	// 	free(pids);
 	return (0);
 }
 
