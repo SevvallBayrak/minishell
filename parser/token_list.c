@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 06:41:59 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/26 23:23:46 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/28 19:44:01 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,34 +47,6 @@ void	add_token(t_token **head, char *value, t_token_type type, int q_type)
 			last = last->next;
 		last->next = new_token;
 	}
-}
-
-void	free_token_list(t_token *list)
-{
-	t_token	*temp;
-
-	while (list)
-	{
-		temp = list->next;
-		free(list->value);
-		free(list);
-		list = temp;
-	}
-}
-
-void	free_str_array(char **arr)
-{
-	int	i;
-
-	i = 0;
-	if (!arr)
-		return ;
-	while (arr[i])
-	{
-		free(arr[i]);
-		i++;
-	}
-	free(arr);
 }
 
 t_cmd	*init_new_cmd(void)

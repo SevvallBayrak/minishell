@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 06:55:36 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/28 16:40:49 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/28 20:10:46 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,8 +67,8 @@ typedef struct s_env
 {
 	char			*key;
 	char			*value;
-	struct s_env	*next;
 	int				is_export_only;
+	struct s_env	*next;
 }	t_env;
 
 typedef struct s_data
@@ -188,5 +188,11 @@ void	free_argv(char **argv);
 void	free_cmd_list(t_cmd *cmd);
 void	free_env(t_env *env);
 void	free_str_array(char **arr);
+void	check_signal_exit_status(t_data *data);
+void	exit_and_free(t_data *data);
+void	data_node_null_and_init_sigenv(int argc, char **argv, \
+			char **envp, t_data *data);
+void	init_data_node(int argc, char **argv, t_data *data);
+void	print_export_list(t_env *env);
 
 #endif

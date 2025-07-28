@@ -6,42 +6,11 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 05:16:51 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/28 15:54:22 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/28 20:05:23 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-int	is_valid_key(const char *key)
-{
-	int	i;
-
-	i = 0;
-	if (!key || (!ft_isalpha(key[0]) && key[0] != '_'))
-		return (0);
-	while (key[i])
-	{
-		if (!ft_isalnum(key[i]) && key[i] != '_')
-			return (0);
-		i++;
-	}
-	return (1);
-}
-
-static void	print_export_list(t_env *env)
-{
-	t_env	*current;
-
-	current = env;
-	while (current)
-	{
-		printf("declare -x %s", current->key);
-		if (current->value)
-			printf("=\"%s\"", current->value);
-		printf("\n");
-		current = current->next;
-	}
-}
 
 int	ft_export(char **argv, t_data *data)
 {

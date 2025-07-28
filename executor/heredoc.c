@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 05:34:45 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/28 16:35:10 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/28 20:22:02 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,23 +14,19 @@
 
 int	is_expandable_delimiter(const char *delim)
 {
-	size_t	len;
-
 	if (!delim)
 		return (0);
-	len = ft_strlen(delim);
-	if ((delim[0] == '\'' && delim[len - 1] == '\'')
-		|| (delim[0] == '\"' && delim[len - 1] == '\"'))
+	if ((delim[0] == '\'' && delim[ft_strlen(delim) - 1] == '\'') ||
+		(delim[0] == '"' && delim[ft_strlen(delim) - 1] == '"'))
 		return (0);
 	return (1);
 }
 
-static void	write_and_free_heredoc(char *expanded, int *pipefd, char *line)
+static void	heredoc_sigint_handler(int sig)
 {
-	write(pipefd[1], expanded, ft_strlen(expanded));
-	write(pipefd[1], "\n", 1);
-	free(line);
-	free(expanded);
+	(void)sig;
+	write(STDOUT_FILENO, "\n", 1);
+	exit(130);
 }
 
 static void	child_heredoc(t_data *data, int *pipefd, t_cmd *cmd)
@@ -38,7 +34,7 @@ static void	child_heredoc(t_data *data, int *pipefd, t_cmd *cmd)
 	char	*line;
 	char	*expanded;
 
-	signal(SIGINT, SIG_DFL);
+	signal(SIGINT, heredoc_sigint_handler);
 	close(pipefd[0]);
 	while (1)
 	{
@@ -53,8 +49,12 @@ static void	child_heredoc(t_data *data, int *pipefd, t_cmd *cmd)
 			expanded = expand_variable(data, line, 0);
 		else
 			expanded = ft_strdup(line);
-		write_and_free_heredoc(expanded, pipefd, line);
+		write(pipefd[1], expanded, ft_strlen(expanded));
+		write(pipefd[1], "\n", 1);
+		free(line);
+		free(expanded);
 	}
+	close(pipefd[1]);
 }
 
 static int	parent_heredoc(pid_t pid, int *pipefd)
@@ -65,6 +65,11 @@ static int	parent_heredoc(pid_t pid, int *pipefd)
 	waitpid(pid, &status, 0);
 	signal(SIGINT, SIG_DFL);
 	close(pipefd[1]);
+	if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
+	{
+		close(pipefd[0]);
+		return (-1);
+	}
 	if (WIFSIGNALED(status))
 		return (close(pipefd[0]), -1);
 	return (pipefd[0]);
@@ -74,6 +79,7 @@ int	handle_heredoc(t_cmd *cmd, t_data *data)
 {
 	int		pipefd[2];
 	pid_t	pid;
+	int		result;
 
 	if (pipe(pipefd) == -1)
 		return (perror("pipe"), -1);
@@ -83,10 +89,14 @@ int	handle_heredoc(t_cmd *cmd, t_data *data)
 	if (pid == 0)
 	{
 		child_heredoc(data, pipefd, cmd);
-		close(pipefd[1]);
 		exit_cleanup(data);
 		exit(0);
 	}
 	else
-		return (parent_heredoc(pid, pipefd));
+	{
+		result = parent_heredoc(pid, pipefd);
+		if (result == -1)
+			data->exit_status = 130;
+		return (result);
+	}
 }

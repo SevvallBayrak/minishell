@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 05:14:01 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/28 15:48:50 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/28 19:38:27 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,24 +28,6 @@ static int	is_numeric(const char *str)
 		i++;
 	}
 	return (1);
-}
-
-void	free_env(t_env *env_list)
-{
-	t_env	*current;
-	t_env	*next_node;
-
-	current = env_list;
-	while (current)
-	{
-		next_node = current->next;
-		if (current->key)
-			free(current->key);
-		if (current->value)
-			free(current->value);
-		free(current);
-		current = next_node;
-	}
 }
 
 void	exit_cleanup(t_data *data)

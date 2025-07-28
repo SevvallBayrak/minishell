@@ -6,26 +6,11 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 06:49:31 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/25 06:49:33 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/28 19:46:23 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-void	free_argv(char **argv)
-{
-	int	i;
-
-	i = 0;
-	if (!argv)
-		return ;
-	while (argv[i])
-	{
-		free(argv[i]);
-		i++;
-	}
-	free(argv);
-}
 
 char	*append_char_to_str(char *s, char c)
 {

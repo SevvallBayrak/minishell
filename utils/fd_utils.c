@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 05:27:21 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/28 16:45:44 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/28 17:44:18 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,17 +45,6 @@ void	handle_exec_error(int result, char **envp)
 		write(2, " command not found\n", 19);
 	free_argv(envp);
 	exit(result);
-}
-
-int	print_no_red_next_word_error(t_token *next)
-{
-	if (!next || next->type != T_WORD)
-	{
-		write(2, "minishell: syntax error near unexpected token `newline'\n",
-			57);
-		return (0);
-	}
-	return (1);
 }
 
 static void	free_cmd_redirection(t_cmd *cmd)

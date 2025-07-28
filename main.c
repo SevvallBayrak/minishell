@@ -6,62 +6,11 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 07:00:04 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/28 17:38:06 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/28 20:03:00 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-void	free_cmd_list(t_cmd *cmd)
-{
-	t_cmd	*tmp;
-
-	while (cmd)
-	{
-		tmp = cmd->next;
-		free_argv(cmd->argv);
-		if (cmd->infile)
-			free(cmd->infile);
-		if (cmd->outfile)
-			free(cmd->outfile);
-		if (cmd->heredoc_delim)
-			free(cmd->heredoc_delim);
-		free(cmd);
-		cmd = tmp;
-	}
-}
-
-void	init_data_node(int argc, char **argv, t_data *data)
-{
-	(void)argc;
-	(void)argv;
-	data->tokens = NULL;
-	data->env = NULL;
-	data->exit_status = 0;
-	data->raw_input = NULL;
-}
-
-void	data_node_null_and_init_sigenv(int argc, char **argv,
-						char **envp, t_data *data)
-{
-	init_data_node(argc, argv, data);
-	init_signal();
-	init_env(data, envp);
-}
-
-void	check_signal_exit_status(t_data *data)
-{
-	if (g_sigquit_flag == 130)
-	{
-		data->exit_status = 130;
-		g_sigquit_flag = 0;
-	}
-	else if (g_sigquit_flag == 131)
-	{
-		data->exit_status = 131;
-		g_sigquit_flag = 0;
-	}
-}
 
 static int	readline_lexer_part2(t_data *data)
 {
@@ -117,16 +66,6 @@ static int	parser_exec(t_data *data)
 	else
 		executor_execute(data);
 	return (2);
-}
-
-void	exit_and_free(t_data *data)
-{
-	rl_clear_history();
-	if (data->env)
-		free_env(data->env);
-	if (data->exported_vars)
-		free_env(data->exported_vars);
-	exit(131);
 }
 
 void	main_loop(t_data *data)

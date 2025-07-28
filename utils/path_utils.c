@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 05:31:16 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/27 00:43:17 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/28 17:44:28 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,4 +95,15 @@ char	*get_command_path(char *cmd, t_data *data, int *result)
 		return (NULL);
 	found_path = search_path_dirs(path_env, cmd, result);
 	return (found_path);
+}
+
+int	print_no_red_next_word_error(t_token *next)
+{
+	if (!next || next->type != T_WORD)
+	{
+		write(2, "minishell: syntax error near unexpected token `newline'\n",
+			57);
+		return (0);
+	}
+	return (1);
 }

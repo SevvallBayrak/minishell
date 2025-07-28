@@ -1,32 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pwd.c                                              :+:      :+:    :+:   */
+/*   check_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/25 05:17:42 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/28 17:56:44 by sbayrak          ###   ########.fr       */
+/*   Created: 2025/07/28 19:50:48 by sbayrak           #+#    #+#             */
+/*   Updated: 2025/07/28 19:50:56 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	ft_pwd(t_data *data)
+int	is_valid_key(const char *key)
 {
-	char	cwd[1024];
+	int	i;
 
-	(void)data;
-	if (!getcwd(cwd, sizeof(cwd)))
+	i = 0;
+	if (!key || (!ft_isalpha(key[0]) && key[0] != '_'))
+		return (0);
+	while (key[i])
 	{
-		perror("pwd");
-		return (1);
+		if (!ft_isalnum(key[i]) && key[i] != '_')
+			return (0);
+		i++;
 	}
-	if (write(1, cwd, ft_strlen(cwd)) == -1
-		|| write(1, "\n", 1) == -1)
-	{
-		perror("pwd: write error");
-		return (1);
-	}
-	return (0);
+	return (1);
 }
