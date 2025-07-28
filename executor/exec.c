@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 05:22:07 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/28 16:23:54 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/28 21:53:05 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,8 @@ static int	execute_one_command(t_cmd *cmd, t_data *data)
 {
 	if (!cmd->argv)
 	{
+		if (redir_no_arg(cmd, data))
+			return (1);
 		if (cmd->is_heredoc)
 		{
 			if (prepare_stdin_for_heredoc(cmd, data))

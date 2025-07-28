@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 06:55:36 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/28 20:10:46 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/28 22:07:28 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,17 +81,11 @@ typedef struct s_data
 	int		exit_status;
 }	t_data;
 
-/* Signal */
 void	init_signal(void);
-void	setup_signal_handlers(void);
 void	set_ignore_signals(void);
 void	set_default_signals(void);
-void	ft_free_split(char **split_array);
-
-/* Builtin */
 int		is_builtin(const char *cmd);
 int		exec_builtin(t_cmd *cmd, t_data *data);
-int		is_valid_identifier(const char *str);
 int		is_valid_key(const char *key);
 int		process_export_arg(char *arg, t_data *data);
 int		ft_cd(char **argv, t_data *data);
@@ -102,21 +96,14 @@ int		ft_env(t_data *data);
 int		ft_export(char **argv, t_data *data);
 int		ft_unset(char **argv, t_data *data);
 
-/* Env */
-t_env	*find_env(t_env *env, const char *key);
-void	add_or_update_env(t_data *data, const char *key, const char *value);
 void	remove_env_var(t_env **env, const char *key);
 char	*get_env_value(t_env *env, const char *key);
 void	update_env_var(t_data *data, const char *key, const char *value);
 void	env_add_back(t_env **env, t_env *new_node);
 char	**env_to_envp(t_env *env);
 void	init_env(t_data *data, char **envp);
-void	load_env_from_envp(t_data *data, char **envp);
-void	ensure_pwd_exists(t_data *data);
 void	add_exported_var(t_data *data, const char *key);
 t_env	*find_exported_var(t_env *exported_vars, const char *key);
-
-/* Lexer */
 t_token	*lexer(t_data *data);
 t_token	*create_token(char *value, int type, int quote);
 void	add_token(t_token **head, char *value, t_token_type type, int q_type);
@@ -129,11 +116,9 @@ int		is_operator(char c);
 int		is_special_char(char c);
 int		ft_isspace(char c);
 int		check_unclosed_quotes(const char *str);
-int		dispatch_lexer(char *input, int i, t_token **tokens, t_data *data);
 int		odd_or_double_quote(char quote);
 int		print_unclosed_quote(t_data *data);
 
-/* Parser */
 t_cmd	*parse_tokens(t_token *tokens);
 t_cmd	*init_new_cmd(void);
 int		handle_pipe_token(t_cmd **current);
@@ -145,7 +130,6 @@ void	assign_redirection(t_cmd *cmd, t_token *tok);
 void	open_and_close_outfile(t_cmd *cmd);
 char	**append_str_to_array(char **arr, char *new_str);
 
-/* Executor */
 int		executor_execute(t_data *data);
 int		execute_command(t_cmd *cmd, char **argv, t_data *data);
 char	*get_command_path(char *cmd, t_data *data, int *result);
@@ -154,7 +138,6 @@ char	*search_path_dirs(char *path_env, char *cmd, int *result);
 int		update_result(char *path, int *result);
 void	handle_exec_error(int result, char **envp);
 
-/* Pipeline */
 int		has_pipe(t_cmd *cmds);
 int		run_pipeline(t_cmd *cmds, t_data *data);
 void	pipe_child_exec(t_cmd *cmd, int in_fd, int out_fd, t_data *data);
@@ -164,7 +147,6 @@ int		count_commands(t_cmd *cmds);
 int		wait_all_children(pid_t *pids, int num_cmds);
 int		cleanup_on_error(pid_t *pids, int i, int in_fd);
 
-/* Heredoc / Redirection */
 int		handle_heredoc(t_cmd *cmd, t_data *data);
 int		handle_heredoc_and_redirects(t_cmd *cmd, t_data *data);
 int		is_expandable_delimiter(const char *delim);
@@ -173,11 +155,9 @@ int		redirect_in(t_cmd *cmd, t_data *data);
 int		redirect_out(t_cmd *cmd, t_data *data);
 int		validate_syntax(t_token *tok, t_data *data);
 
-/* Expansion */
 char	*expand_variable(t_data *data, char *str, int i);
 void	expand_tokens(t_data *data, t_token *tokens);
 
-/* Utils */
 int		is_invalid_redir(const char *input, int i, t_data *data);
 char	*ft_strjoin_path(const char *dir, const char *cmd);
 char	*ft_strndup(const char *s1, int a);
@@ -191,8 +171,9 @@ void	free_str_array(char **arr);
 void	check_signal_exit_status(t_data *data);
 void	exit_and_free(t_data *data);
 void	data_node_null_and_init_sigenv(int argc, char **argv, \
-			char **envp, t_data *data);
+char	**envp, t_data *data);
 void	init_data_node(int argc, char **argv, t_data *data);
 void	print_export_list(t_env *env);
+int		redir_no_arg(t_cmd *cmd, t_data *data);
 
 #endif

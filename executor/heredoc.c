@@ -6,7 +6,7 @@
 /*   By: sbayrak <sbayrak@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 05:34:45 by sbayrak           #+#    #+#             */
-/*   Updated: 2025/07/28 20:22:02 by sbayrak          ###   ########.fr       */
+/*   Updated: 2025/07/28 22:04:21 by sbayrak          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,8 @@ int	is_expandable_delimiter(const char *delim)
 {
 	if (!delim)
 		return (0);
-	if ((delim[0] == '\'' && delim[ft_strlen(delim) - 1] == '\'') ||
-		(delim[0] == '"' && delim[ft_strlen(delim) - 1] == '"'))
+	if ((delim[0] == '\'' && delim[ft_strlen(delim) - 1] == '\'')
+		|| (delim[0] == '"' && delim[ft_strlen(delim) - 1] == '"'))
 		return (0);
 	return (1);
 }
